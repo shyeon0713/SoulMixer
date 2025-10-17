@@ -25,7 +25,7 @@ RenderSettings:
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 0
-  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
+  m_SubtractiveShadowColor: {r: 0.104708076, g: 0.10978357, b: 0.122641504, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
@@ -252,8 +252,8 @@ Transform:
   m_GameObject: {fileID: 104129988}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 8.719318, y: -12.079176, z: 7.367218}
-  m_LocalScale: {x: 20, y: 20, z: 40}
+  m_LocalPosition: {x: 47.2, y: -12.079176, z: 7.367218}
+  m_LocalScale: {x: 30, y: 20, z: 40}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 764433147}
@@ -743,7 +743,7 @@ Transform:
   m_GameObject: {fileID: 496645488}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 21.9, z: 80.2}
+  m_LocalPosition: {x: 80.6, y: 21.9, z: 97.6}
   m_LocalScale: {x: 200, y: 80, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -793,7 +793,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 80a03f994296b874ba5a70b8f18e88fd, type: 2}
+  - {fileID: 2100000, guid: ff4486884ba12e54b82a93f46459f735, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1046,7 +1046,7 @@ Transform:
   m_GameObject: {fileID: 669659763}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.7964498, z: -0, w: 0.60470474}
-  m_LocalPosition: {x: -35.100006, y: 22.200005, z: 32.5}
+  m_LocalPosition: {x: -35.100006, y: 22.200005, z: 17.1}
   m_LocalScale: {x: 200, y: 80, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1096,7 +1096,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ff4486884ba12e54b82a93f46459f735, type: 2}
+  - {fileID: 2100000, guid: 5ad1a92956b4f2a48bebfb8e83470c5f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1241,7 +1241,7 @@ Transform:
   m_GameObject: {fileID: 742850161}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 81.1, y: 22.2, z: 32.5}
+  m_LocalPosition: {x: 173.9, y: 22.2, z: 27.5}
   m_LocalScale: {x: 200, y: 80, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1492,8 +1492,8 @@ Transform:
   m_GameObject: {fileID: 842184270}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 25.5, z: -51.1}
-  m_LocalScale: {x: 200, y: 80, z: 1}
+  m_LocalPosition: {x: 54.6, y: 25.5, z: -74.3}
+  m_LocalScale: {x: 240, y: 80, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 764433147}
@@ -1702,13 +1702,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 897944933}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.12399072, y: -0.29898942, z: 0.039214857, w: 0.94535387}
+  m_LocalRotation: {x: 0.12435949, y: 0.28988907, z: -0.038020518, w: 0.9481843}
   m_LocalPosition: {x: 45.1, y: 26.3, z: -164.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 14.944, y: -35.101, z: 0}
+  m_LocalEulerAnglesHint: {x: 14.944, y: 34, z: 0}
 --- !u!1 &972189086
 GameObject:
   m_ObjectHideFlags: 0
@@ -2588,19 +2588,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 10099167130e70b489cb15d1a5f43fbc, type: 3}
       propertyPath: m_LocalScale.x
-      value: 20
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 10099167130e70b489cb15d1a5f43fbc, type: 3}
       propertyPath: m_LocalScale.y
-      value: 20
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 10099167130e70b489cb15d1a5f43fbc, type: 3}
       propertyPath: m_LocalScale.z
-      value: 20
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 10099167130e70b489cb15d1a5f43fbc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 352.11044
+      value: 443.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 10099167130e70b489cb15d1a5f43fbc, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2608,7 +2608,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 10099167130e70b489cb15d1a5f43fbc, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -76.12218
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 10099167130e70b489cb15d1a5f43fbc, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2641,6 +2641,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 10099167130e70b489cb15d1a5f43fbc, type: 3}
       propertyPath: m_Name
       value: SM_Unhyun_Noan_Ceiling_A001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1613040534266868646, guid: 10099167130e70b489cb15d1a5f43fbc, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.63
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
