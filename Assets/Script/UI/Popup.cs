@@ -8,6 +8,7 @@ public class Popup : MonoBehaviour
     void Start()
     {
         PopUpSetting.SetActive(false);
+
     }
 
 }
