@@ -64,6 +64,7 @@ public class Cameramove : MonoBehaviour
         Buttons[1].onClick.AddListener(MovePos2);  //pos2로 이동
         Buttons[2].onClick.AddListener(MovePos3);  //pos3로 이동
         Buttons[3].onClick.AddListener(MovePos4);  //pos4로 이동
+        Buttons[4].onClick.AddListener(MovePos1);  //pos4로 이동
 
     }
 
