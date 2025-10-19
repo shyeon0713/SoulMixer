@@ -1133,6 +1133,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 287475371}
+  - component: {fileID: 287475374}
+  - component: {fileID: 287475373}
+  - component: {fileID: 287475372}
   m_Layer: 0
   m_Name: PlayMusic
   m_TagString: Untagged
@@ -1156,6 +1159,65 @@ Transform:
   - {fileID: 615347365}
   m_Father: {fileID: 1014226364}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &287475372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 287475370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b1a476a7360e614c91b62bdde78744e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  conductor: {fileID: 0}
+  chart: {fileID: 0}
+  spawner: {fileID: 0}
+  perfect: 0.033
+  great: 0.066
+  good: 0.1
+--- !u!114 &287475373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 287475370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc0e8034291e2e249a1e7efe12e077b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lane: 0
+  hitTimeSec: 0
+  duration: 0
+  scrollSpeed: 5
+  lanerOrigin: {x: 0, y: 0}
+  travelDir: {x: -1, y: 0}
+--- !u!114 &287475374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 287475370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d562f5c4c4d73d84982c067f9e839bfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  conductor: {fileID: 0}
+  chart: {fileID: 0}
+  notePrefab: {fileID: 0}
+  spawnLeanTime: 2
+  scrollSpeed: 6
+  despawnAfterSec: 1
+  laneCount: 3
+  judgeLinPos: {x: 0, y: 0}
+  travelDir: {x: -1, y: 0}
+  laneSpacing: 1.25
+  poolRoot: {fileID: 0}
 --- !u!1 &326211691
 GameObject:
   m_ObjectHideFlags: 0
@@ -2343,7 +2405,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 33a161a077b3d8a499e732d208dbdc12, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.1669335
+      value: 2.54
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 33a161a077b3d8a499e732d208dbdc12, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4823,7 +4885,7 @@ GameObject:
   m_Component:
   - component: {fileID: 972189087}
   m_Layer: 0
-  m_Name: OB_Player
+  m_Name: OB_PlayerPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8958,6 +9020,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 571ab95c4bc96954f91ff4fde0957ce4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PopUpSetting: {fileID: 0}
 --- !u!114 &2069621002
 MonoBehaviour:
   m_ObjectHideFlags: 0

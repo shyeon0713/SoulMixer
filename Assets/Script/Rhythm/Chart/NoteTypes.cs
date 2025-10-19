@@ -16,7 +16,7 @@ namespace Rhythm.Charting
         public int lane; //단일 라인
         public notetype type;
         public float duration;  // hold는 sec.로 tap이면 0
-        public int sildedir; // 슬라이드 방향
+        public int sildeDir; // 슬라이드 방향
     }
 
     public class chartmeta
