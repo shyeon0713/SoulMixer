@@ -1,0 +1,13 @@
+{
+  "title": "My Song",
+  "totalSec": 93.5,
+  "counts": { "normalL": 120, "normalR": 110, "long": 24, "slideL": 18, "slideR": 20 },
+  "totalLongSec": 12.8,
+  "notes": [
+    { "id": 1, "type": "NormalNote_L", "timeSec": 1.000 },
+    { "id": 2, "type": "NormalNote_R", "timeSec": 1.200 },
+    { "id": 3, "type": "LongNote",     "timeSec": 2.000, "durationSec": 1.600 },
+    { "id": 4, "type": "SlideNote_L",  "timeSec": 3.000 },
+    { "id": 5, "type": "SlideNote_R",  "timeSec": 3.500 }
+  ]
+}
