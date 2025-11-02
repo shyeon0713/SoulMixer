@@ -139,10 +139,50 @@ public class Judge : MonoBehaviour
     #region -롱노트 해제부분
     public void LongNoteEnd(double inputDspTime)
     {
+        if(!_holding) return;
+
+        float t = (float)(inputDspTime - conductor.dspStart) + conductor.userOffsetms / 1000f;
+        float endTime = _activeLong.Timesec + _activeLong.durationSec;
+        float w = MsToSec(longEndMs);
+        if (Mathf.Abs(endTime - t) <= w)
+        {
+            OnHit?.Invoke(_activeLong, GradeFromDelta(endTime - t));
+        }
+        else
+        {
+            OnMiss?.Invoke(_activeLong);
+        }
+
+        _holding = false;
+    }
+    #endregion
+
+    #region 슬라이드 방향 : -1(left) , + 1(right)
+    public void FeedSlide(int dir, double inputDspTime)
+    {
+        var targetType = (dir < 0 ) ? NoteType.SlideNote_L : NoteType.SlideNote_R;
+        float t = (float)(inputDspTime - conductor.dspStart) + conductor.userOffsetms / 1000f;
+
+        int best = -1; float bestDiff = 999f;
+        for (int i = _idx; i < _notes.Length && i < _idx + 16; i++)
+        {
+            if (_notes[i].type != targetType) continue;
+            float d = Mathf.Abs(_notes[i].Timesec - t);
+            if (d < bestDiff) { bestDiff = d; best = i; }
+            if (_notes[i].Timesec > t + MsToSec(goodMs)) break;
+        }
+
+        if (best < 0 || GradeFromDelta(_notes[best].Timesec - t) == HitGrade.Miss)
+        {
+            OnMiss?.Invoke(new NoteData { type = targetType, Timesec = t });
+            return;
+        }
+
+        var g = GradeFromDelta(_notes[best].Timesec - t);
+        OnHit?.Invoke(_notes[best], g);
+        if (best == _idx) _idx++;
 
     }
-
-
     #endregion
 }
 
