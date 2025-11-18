@@ -121,10 +121,8 @@ public class NoteSpawner : MonoBehaviour
     void SpawnOne(NoteData n)
     {
         bool isLong = (n.type == NoteType.LongNote);
-        int laneIdx = (int)n.lane;
-        if (laneIdx == 0 && n.lane == 0f) laneIdx = defaultLane; // 미사용 시 기본
 
-        float x = LaneToX(laneIdx);
+        float x = 0f;
 
         if (isLong)
         {

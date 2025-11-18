@@ -54,8 +54,8 @@ public class GameEntry : MonoBehaviour
                 id = n.id,
                 type = t,
                 Timesec = n.timesec,      
-                durationSec = n.durationsec,
-                lane = 0
+                durationSec = n.durationsec
+               
             });
         }
         list.Sort((a, b) => a.Timesec.CompareTo(b.Timesec));

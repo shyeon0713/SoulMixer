@@ -22,7 +22,4 @@ public class NoteData
     [Tooltip("Long 노트일 때만 사용 (초)")]
     public float durationSec = 0f;
 
-    [Header("Optional")]
-    public float lane = 0; // 추후에 레인개념 추가 -> 현재는 레인 사용안함
-
 }

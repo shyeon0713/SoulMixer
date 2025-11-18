@@ -60,8 +60,7 @@ public static class ChartLoader
                 id = n.id,
                 type = t,
                 Timesec = n.timesec,
-                durationSec = n.durationsec,
-                lane = 0  //현재 라인구분은하지 않아 제외
+                durationSec = n.durationsec
 
             });
         }
