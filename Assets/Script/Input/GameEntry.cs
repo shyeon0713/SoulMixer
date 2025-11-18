@@ -11,6 +11,14 @@ public class GameEntry : MonoBehaviour
     [Header("Selected Song (선택 결과가 들어오는 곳)")]
     public SongEntry selectedSongEntry; // ← 이 필드가 꼭 있어야 함!
 
+
+    // 테스트용: 씬 켜지면 자동 재생
+    void Start()
+    {
+        Debug.Log("[GameEntry] Start 호출");
+        InitAndPlay();
+    }
+
     // 버튼에서 호출할 초기화 + 재생
     public void InitAndPlay()
     {
@@ -23,9 +31,19 @@ public class GameEntry : MonoBehaviour
 
         // 1) 오디오 연결
         audioSource.clip = selectedSongEntry.audioClip;
+        Debug.Log($"[GameEntry] AudioClip = {audioSource.clip?.name}");
 
         // 2) 차트 파싱 → NoteData[]
         var chart = JsonUtility.FromJson<SongChartJson>(selectedSongEntry.chartJson.text);
+
+        //파싱여부 확인
+        if (chart == null || chart.notes == null)
+        {
+            Debug.LogError("[GameEntry] JSON 파싱 실패 또는 chart.notes == null");
+            return;
+        }
+
+
         var notes = ConvertToNoteData(chart);
 
         // 3) 판정/스폰에 전달
@@ -59,6 +77,7 @@ public class GameEntry : MonoBehaviour
             });
         }
         list.Sort((a, b) => a.Timesec.CompareTo(b.Timesec));
+        Debug.Log($"[GameEntry] ConvertToNoteData - notes: {list.Count}");
         return list.ToArray();
     }
 }

@@ -5,6 +5,8 @@ public enum HitGrade { Miss, Good, Great, Perfect} //총 4가지 판정으로 구분
 
 public class Judge : MonoBehaviour
 {
+    private int _nextIndex;  // 다음에 판정할 노트 인덱스
+
     [Header("Ref")]
     public Conductor conductor;
 
@@ -31,6 +33,11 @@ public class Judge : MonoBehaviour
         _notes = notes;
         _idx = 0;
         _holding = false;
+
+        if (_notes == null)
+            Debug.LogError("[Judge] LoadChart: notes == null");
+        else
+            Debug.Log($"[Judge] LoadChart: {_notes.Length} notes loaded");
     }
 
     float MsToSec(int ms) => ms * 0.001f;
@@ -48,6 +55,9 @@ public class Judge : MonoBehaviour
     #region 진행 포인터 앞으로 밀기 (지나간 노트 정리)
     void CullPastNotes(float now)
     {
+        if (_notes == null || _notes.Length == 0)
+            return; // 아직 차트 안 들어온 상태면 그냥 리턴
+
         while (_idx < _notes.Length && _notes[_idx].Timesec < now - MsToSec(goodMs))
         {
             OnMiss?.Invoke(_notes[_idx]);
@@ -69,19 +79,24 @@ public class Judge : MonoBehaviour
 
     void FeedTap(NoteType type, double inputDspTime)  //일반노트 -> 마우스 좌, 우 단일 클릭
     {
+        if (_notes == null || _notes.Length == 0 || conductor == null)
+            return; // 차트 없는데 입력 들어오면 무시
+
         float t = (float)(inputDspTime - conductor.dspStart) + conductor.userOffsetms / 1000f;
         float now = conductor.NowSec;
+
         CullPastNotes(now);
 
         int best = -1;
         float bestDiff = 999f;
 
-        //(성능상 K=12 정도 권장)
+        
         for (int i = _idx; i < _notes.Length && i < _idx + 16; i++)
         {
             if (_notes[i].type != type) continue;
             float d = Mathf.Abs(_notes[i].Timesec - t);
             if (d < bestDiff) { bestDiff = d; best = i; }
+
             if (_notes[i].Timesec > t + MsToSec(goodMs)) break;
         }
 
@@ -104,17 +119,25 @@ public class Judge : MonoBehaviour
     #region 롱노트 시작부분
     public void LongNoteStart(double inputDsptime)
     {
+        if (_notes == null || _notes.Length == 0 || conductor == null)
+            return; // 차트 없는데 입력 들어오면 무시
+
         float t = (float)(inputDsptime - conductor.dspStart) + conductor.userOffsetms / 1000f;
         float w = MsToSec(longStartMs);
 
         int best = -1;
         float bestDiff = 999f;
 
-        for (int i = _idx; i<_notes.Length && i<_idx+24; i++)
+        for (int i = _idx; i < _notes.Length && i < _idx + 24; i++)
         {
             if (_notes[i].type != NoteType.LongNote) continue;
-            float d = Mathf.Abs(_notes[i].Timesec - t); 
-            if (d < bestDiff) bestDiff = d; best = i;
+            
+            float d = Mathf.Abs(_notes[i].Timesec - t);
+
+            if (d < bestDiff) { 
+            bestDiff = d;
+            best = i; }
+
             if (_notes[i].Timesec > t + w) break;
         }
 
@@ -126,6 +149,8 @@ public class Judge : MonoBehaviour
 
         _activeLong = _notes[best];
         _holding = true;
+
+
         OnHit?.Invoke(_activeLong, GradeFromDelta(_activeLong.Timesec -t));
 
         if(best == _idx)
@@ -139,11 +164,14 @@ public class Judge : MonoBehaviour
     #region -롱노트 해제부분
     public void LongNoteEnd(double inputDspTime)
     {
-        if(!_holding) return;
+        if (!_holding || _notes == null || conductor == null)
+            return;
 
         float t = (float)(inputDspTime - conductor.dspStart) + conductor.userOffsetms / 1000f;
         float endTime = _activeLong.Timesec + _activeLong.durationSec;
         float w = MsToSec(longEndMs);
+
+
         if (Mathf.Abs(endTime - t) <= w)
         {
             OnHit?.Invoke(_activeLong, GradeFromDelta(endTime - t));
@@ -160,15 +188,24 @@ public class Judge : MonoBehaviour
     #region 슬라이드 방향 : -1(left) , + 1(right)
     public void FeedSlide(int dir, double inputDspTime)
     {
+        if (_notes == null || _notes.Length == 0 || conductor == null)
+            return; // 차트 없는데 입력 들어오면 무시
+
         var targetType = (dir < 0 ) ? NoteType.SlideNote_L : NoteType.SlideNote_R;
         float t = (float)(inputDspTime - conductor.dspStart) + conductor.userOffsetms / 1000f;
 
-        int best = -1; float bestDiff = 999f;
+        int best = -1; 
+        float bestDiff = 999f;
+
         for (int i = _idx; i < _notes.Length && i < _idx + 16; i++)
         {
             if (_notes[i].type != targetType) continue;
+
             float d = Mathf.Abs(_notes[i].Timesec - t);
-            if (d < bestDiff) { bestDiff = d; best = i; }
+            if (d < bestDiff) 
+            { bestDiff = d; 
+                best = i; 
+            }
             if (_notes[i].Timesec > t + MsToSec(goodMs)) break;
         }
 
@@ -180,7 +217,9 @@ public class Judge : MonoBehaviour
 
         var g = GradeFromDelta(_notes[best].Timesec - t);
         OnHit?.Invoke(_notes[best], g);
-        if (best == _idx) _idx++;
+
+        if (best == _idx) 
+            _idx++;
 
     }
     #endregion

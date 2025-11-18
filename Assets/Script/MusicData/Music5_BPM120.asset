@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2d784635c3fb8b54ebac72090b136cb4, type: 3}
-  m_Name: Music5
+  m_Name: Music5_BPM120
   m_EditorClassIdentifier: 
   songId: M3
   title: Music3
   artist: artist
   audioClip: {fileID: 8300000, guid: d2d6b801533d2524fa3eae8082f71e78, type: 3}
   offsetMs: 0
-  bpm: 0
-  chartJson: {fileID: 0}
-  difficulty: 1
+  bpm: 120
+  chartJson: {fileID: 4900000, guid: 9fabdbbafeefc984fb65ed8701c3b68c, type: 3}
+  difficulty: 2
