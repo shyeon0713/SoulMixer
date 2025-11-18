@@ -41,6 +41,7 @@ public class SetMusic : MonoBehaviour
         gameEntry.InitAndPlay();
     }
 
+
     public SongEntry FindSongByTitle(string title)
     {
         return songs.FirstOrDefault(s => s.title == title);

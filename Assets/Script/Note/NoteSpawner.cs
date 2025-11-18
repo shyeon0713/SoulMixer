@@ -17,11 +17,6 @@ public class NoteSpawner : MonoBehaviour
     public float spawnLeadTimeSec = 2.0f;     // 몇 초 앞의 노트를 미리 생성
     public float despawnLagSec = 1.0f;        // 지나간 후 회수 지연
 
-    [Header("Lanes (px)")]
-    public float laneOriginPx = 0f;
-    public float laneSpacingPx = 100f;
-    public int defaultLane = 0;               // noteData.lane 미사용 시 기본
-
     [Header("Pooling")]
     public int initialSinglePool = 64;
     public int initialLongPool = 16;
@@ -41,6 +36,7 @@ public class NoteSpawner : MonoBehaviour
         public bool isLong;
     }
 
+    #region Json파일 로드
     public void LoadChart(NoteData[] notes)
     {
         _notes = notes;
@@ -48,32 +44,62 @@ public class NoteSpawner : MonoBehaviour
 
         // 풀 초기화(최초 1회만 하고 싶다면 조건 분기)
         WarmupPools();
+        Debug.Log($"[NoteSpawner] LoadChart: notes = {(_notes == null ? 0 : _notes.Length)}");
     }
+    #endregion
 
     void WarmupPools()
     {
-        // 싱글
+        //노트 인식이 되는지 확인
+        if (singleNotePrefab == null || noteLayer == null)
+        {
+            Debug.LogWarning("[NoteSpawner] WarmupPools: prefab 또는 noteLayer가 비어 있음");
+            return;
+        }
+
+        //싱글 노트
         for (int i = _singlePool.Count; i < initialSinglePool; i++)
         {
             var inst = Instantiate(singleNotePrefab, noteLayer);
             inst.gameObject.SetActive(false);
             _singlePool.Push(inst);
         }
-        // 롱
-        for (int i = _longPool.Count; i < initialLongPool; i++)
+
+        // 롱 노트
+        if (longNotePrefab != null)
         {
-            var inst = Instantiate(longNotePrefab, noteLayer);
-            inst.gameObject.SetActive(false);
-            _longPool.Push(inst);
+            for (int i = _longPool.Count; i < initialLongPool; i++)
+            {
+                var inst = Instantiate(longNotePrefab, noteLayer);
+                inst.gameObject.SetActive(false);
+                _longPool.Push(inst);
+            }
         }
     }
 
-    float LaneToX(int laneIndex) => laneOriginPx + laneIndex * laneSpacingPx;
-
-
+   
     void Update()
     {
-        if (_notes == null || conductor == null) return;
+        if (_notes == null) 
+            return;
+
+        //디버깅 확인
+        if(conductor == null)
+        {
+            Debug.LogWarning("[NoteSpawner] Update: conductor가 비어 있어서 스폰 안 함");
+            return;
+        }
+        if (noteLayer == null)
+        {
+            Debug.LogWarning("[NoteSpawner] Update: noteLayer가 비어 있어서 스폰 안 함");
+            return;
+        }
+        if (singleNotePrefab == null)
+        {
+            Debug.LogWarning("[NoteSpawner] Update: singleNotePrefab이 비어 있어서 스폰 안 함");
+            return;
+        }
+        //디버깅
 
         float now = conductor.NowSec;
 
@@ -122,7 +148,7 @@ public class NoteSpawner : MonoBehaviour
     {
         bool isLong = (n.type == NoteType.LongNote);
 
-        float x = 0f;
+        float x = 0f;  //레인은 일단 0으로 지정
 
         if (isLong)
         {
@@ -134,7 +160,6 @@ public class NoteSpawner : MonoBehaviour
             view.scrollSpeed = scrollSpeedPx;
             view.startTimeSec = n.Timesec;
             view.durationSec = n.durationSec;
-            view.SetLaneX(x);
 
             // 첫 프레임 위치 보정
             view.UpdateVisual(conductor.NowSec);
@@ -151,6 +176,7 @@ public class NoteSpawner : MonoBehaviour
         {
             var rect = GetSingle();
             rect.gameObject.SetActive(true);
+            rect.SetParent(noteLayer, false);
 
             // 스프라이트 적용
             var img = rect.GetComponent<Image>();
@@ -162,7 +188,7 @@ public class NoteSpawner : MonoBehaviour
 
             // X/Y 초기 배치
             float y = (n.Timesec - conductor.NowSec) * scrollSpeedPx;
-            rect.anchoredPosition = new Vector2(x, y);
+            rect.anchoredPosition = new Vector2(0, y);
 
             _active.Add(new ActiveItem
             {
@@ -173,9 +199,6 @@ public class NoteSpawner : MonoBehaviour
             });
         }
     }
-
-
-    // ===== Pool =====
 
     RectTransform GetSingle()
     {
@@ -191,11 +214,13 @@ public class NoteSpawner : MonoBehaviour
 
     LongNoteView GetLong()
     {
+        if (longNotePrefab == null) return null;
         if (_longPool.Count > 0) return _longPool.Pop();
         return Instantiate(longNotePrefab, noteLayer);
     }
     void RecycleLong(LongNoteView v)
     {
+        if (v == null) return;
         v.gameObject.SetActive(false);
         v.transform.SetParent(noteLayer, false);
         _longPool.Push(v);
