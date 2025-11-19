@@ -8,9 +8,9 @@ public class GameEntry : MonoBehaviour
     public NoteSpawner noteSpawner;     // UGUI 스포너
     public AudioSource audioSource;
 
-    [Header("Selected Song (선택 결과가 들어오는 곳)")]
-    public SongEntry selectedSongEntry; // ← 이 필드가 꼭 있어야 함!
-
+    [Header("악곡/난이도")]
+    public SongEntry selectedSongEntry;
+    public Difficulty selectedDifficulty; // 난이도
 
     // 테스트용: 씬 켜지면 자동 재생
     void Start()
@@ -27,57 +27,39 @@ public class GameEntry : MonoBehaviour
             Debug.LogError("[GameEntry] selectedSongEntry가 비었습니다.");
             return;
         }
+
+
         if (!audioSource) audioSource = GetComponent<AudioSource>();
+
+
 
         // 1) 오디오 연결
         audioSource.clip = selectedSongEntry.audioClip;
         Debug.Log($"[GameEntry] AudioClip = {audioSource.clip?.name}");
 
-        // 2) 차트 파싱 → NoteData[]
-        var chart = JsonUtility.FromJson<SongChartJson>(selectedSongEntry.chartJson.text);
 
-        //파싱여부 확인
-        if (chart == null || chart.notes == null)
+
+        // 2) 차트 파싱 → NoteData[]
+        var notes = ChartLoader.LoadFromSongEntry(selectedSongEntry, selectedDifficulty);
+        if (notes.Length == 0)
         {
-            Debug.LogError("[GameEntry] JSON 파싱 실패 또는 chart.notes == null");
+            Debug.LogError("[GameEntry] LoadFromSongEntry 결과가 비었습니다.");
             return;
         }
 
-
-        var notes = ConvertToNoteData(chart);
-
-        // 3) 판정/스폰에 전달
+        //판정/ 스폰 세팅
         judge.LoadChart(notes);
         noteSpawner.LoadChart(notes);
 
-        // 4) 오프셋(선택)
-        conductor.userOffsetms = selectedSongEntry.offsetMs;
+
+        // 오프셋 적용
+        var chart = selectedSongEntry.GetChart(selectedDifficulty);
+        conductor.userOffsetms = selectedSongEntry.offsetMs + chart.offsetMs;
 
         // 5) 재생
         conductor.music = audioSource;
         conductor.PlayScheduled(0.10);
     }
-
-    // JSON → NoteData[] 변환 (네 프로젝트 필드명에 맞게)
-    private NoteData[] ConvertToNoteData(SongChartJson chart)
-    {
-        var list = new System.Collections.Generic.List<NoteData>(chart.notes.Count);
-        foreach (var n in chart.notes)
-        {
-            if (!System.Enum.TryParse(n.type, out NoteType t))
-                t = NoteType.NormalNote_L;
-
-            list.Add(new NoteData
-            {
-                id = n.id,
-                type = t,
-                Timesec = n.timesec,      
-                durationSec = n.durationsec
-               
-            });
-        }
-        list.Sort((a, b) => a.Timesec.CompareTo(b.Timesec));
-        Debug.Log($"[GameEntry] ConvertToNoteData - notes: {list.Count}");
-        return list.ToArray();
-    }
 }
+
+ 

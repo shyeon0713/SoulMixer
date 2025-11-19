@@ -7,17 +7,39 @@ public enum Difficulty { Easy, Normal, Hard, Expert }
 [System.Serializable]
 public class SongEntry : ScriptableObject
 {
-    public string songId;                 // 내부 키(폴더명 등)
+    [Header("곡 설명부분")]
+    public string songId;                
     public string title;
-    public string artist;
-    public AudioClip audioClip;           // 오디오 직접 참조
-  //  public Sprite MainImage;                 // 자켓 이미지
+    public AudioClip audioClip;           
+                                                      
 
-    [Header("Timing")]
-    public float offsetMs = 0f;           // 유저/채보 보정용
-    public float bpm;                     // 메타
+    [Header("곡 BPM")]
+    public float offsetMs = 0f;           // 곡 전체 공통 오프셋
+    public float bpm;                     
 
-    [Header("Charts")]
-    public TextAsset chartJson;           // 채보(TextAsset)
-    public Difficulty difficulty = Difficulty.Normal;
+
+    [Header("난이도별 채보")]
+    public ChartEntry[] charts;
+
+    [System.Serializable]
+    public class ChartEntry
+    {
+        public Difficulty difficulty = Difficulty.Normal; 
+        public TextAsset chartJson;                       
+        public int level;                                 
+        public float offsetMs = 0f;                       
+    }
+
+    public ChartEntry GetChart(Difficulty diff)
+    {
+        if (charts == null) return null;
+
+        foreach (var chart in charts)
+        {
+            if (chart != null && chart.difficulty == diff)
+                return chart;
+        }
+
+        return null;
+    }
 }
