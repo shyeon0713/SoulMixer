@@ -4,13 +4,20 @@ using UnityEngine.UI;
 // 난이도 설정 코드 - UI
 public class SelectDifficultyUI : MonoBehaviour
 {
+
+    [Header("난이도 버튼모음")]
     public Button easybutton;
     public Button normalbutton;
     public Button hardbutton;
     public Button expertbutton;
 
+    [Header("현재 선택한 곡 설정 저장 변수")]
     private SongEntry currentSong;
     public GameEntry gameEntry;
+
+    [Header("UI 활성화부분")]
+    public GameObject SelectUI;  // 세팅창
+    public GameObject PlayUI;  // 플레이창
 
 
     public void Start()
@@ -44,6 +51,7 @@ public class SelectDifficultyUI : MonoBehaviour
         SetButton();  // 버튼 선택
     }
     #endregion
+
     #region - 난이도 버튼 설정
     void SetButton()
     {
@@ -64,5 +72,8 @@ public class SelectDifficultyUI : MonoBehaviour
         gameEntry.selectedDifficulty = diff;
 
         gameEntry.InitAndPlay();  // 해당 난이도로 게임 시작
+
+        SelectUI.SetActive(false);  // 선택창 비활성화
+        PlayUI.SetActive(true);  // 플레이창으로 이동하여 플레이
     }
 }

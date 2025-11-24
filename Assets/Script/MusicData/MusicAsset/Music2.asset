@@ -14,25 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   songId: M2
   title: Music2
-  audioClip: {fileID: 8300000, guid: e715982dbe7e8a842af1456dae19a736, type: 3}
+  audioClip: {fileID: 8300000, guid: fda3d91c8b191d844affbb05f608db0d, type: 3}
   charts:
   - difficulty: 0
     chartJson: {fileID: 0}
-    level: 0
-    offsetMs: 0
-    bpm: 0
+    offsetMs: 5
+    bpm: 30
   - difficulty: 1
     chartJson: {fileID: 0}
-    level: 0
-    offsetMs: 0
-    bpm: 0
+    offsetMs: 5
+    bpm: 60
   - difficulty: 2
     chartJson: {fileID: 0}
-    level: 0
-    offsetMs: 0
-    bpm: 0
+    offsetMs: 5
+    bpm: 90
   - difficulty: 3
     chartJson: {fileID: 0}
-    level: 0
-    offsetMs: 0
-    bpm: 0
+    offsetMs: 5
+    bpm: 120

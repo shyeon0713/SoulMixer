@@ -20,8 +20,7 @@ public class SongEntry : ScriptableObject
     public class ChartEntry
     {
         public Difficulty difficulty; 
-        public TextAsset chartJson;                       
-        public int level;                                 
+        public TextAsset chartJson;                                                      
         public float offsetMs = 0f;
         public float bpm;
     }

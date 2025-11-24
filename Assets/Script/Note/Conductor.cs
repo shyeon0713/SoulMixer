@@ -18,7 +18,7 @@ public class Conductor : MonoBehaviour
 {
     public AudioSource music;
     public double dspStart;
-    public float userOffsetms = 0f;
+   public float userOffsetms = 0f;
 
     public float NowSec => (float)(AudioSettings.dspTime - dspStart) + userOffsetms / 1000f;
 

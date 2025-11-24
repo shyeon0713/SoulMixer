@@ -14,25 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   songId: M1
   title: music1
-  audioClip: {fileID: 8300000, guid: b2465c6a7bca437448366dfd0a71058d, type: 3}
+  audioClip: {fileID: 8300000, guid: 9b939024e104d6842b613c159a0c86ba, type: 3}
   charts:
   - difficulty: 0
-    chartJson: {fileID: 0}
-    level: 0
-    offsetMs: 0
-    bpm: 0
+    chartJson: {fileID: 4900000, guid: 5494b486679b9784d81eb3ee445fedba, type: 3}
+    offsetMs: 5
+    bpm: 30
   - difficulty: 1
-    chartJson: {fileID: 0}
-    level: 0
-    offsetMs: 0
-    bpm: 0
+    chartJson: {fileID: 4900000, guid: 458f4742515ba834db2d0db189723bf2, type: 3}
+    offsetMs: 5
+    bpm: 60
   - difficulty: 2
-    chartJson: {fileID: 0}
-    level: 0
-    offsetMs: 0
-    bpm: 0
+    chartJson: {fileID: 4900000, guid: 70b67885df3070a44b107bac84b7a459, type: 3}
+    offsetMs: 5
+    bpm: 90
   - difficulty: 3
-    chartJson: {fileID: 0}
-    level: 0
-    offsetMs: 0
-    bpm: 0
+    chartJson: {fileID: 4900000, guid: 1f2cee77d4ef839419a2c0e3ff4e1710, type: 3}
+    offsetMs: 5
+    bpm: 120
