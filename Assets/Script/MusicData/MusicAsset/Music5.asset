@@ -15,22 +15,24 @@ MonoBehaviour:
   songId: M5
   title: Music
   audioClip: {fileID: 8300000, guid: 932b2d7ed5cbd9a499b0510756b21c08, type: 3}
-  offsetMs: 0
-  bpm: 120
   charts:
   - difficulty: 0
     chartJson: {fileID: 4900000, guid: f0b5ab74b00718b4cbaf60908de112f3, type: 3}
     level: 0
     offsetMs: 0
+    bpm: 30
   - difficulty: 1
     chartJson: {fileID: 4900000, guid: b022b8823032c3e4294cdd16505aa7ac, type: 3}
     level: 0
     offsetMs: 0
+    bpm: 60
   - difficulty: 2
     chartJson: {fileID: 4900000, guid: 387fc2ce2b8a4834aa5f581099720c25, type: 3}
     level: 0
     offsetMs: 0
+    bpm: 90
   - difficulty: 3
     chartJson: {fileID: 4900000, guid: 9fabdbbafeefc984fb65ed8701c3b68c, type: 3}
     level: 0
     offsetMs: 0
+    bpm: 120
