@@ -10,12 +10,7 @@ public class SongEntry : ScriptableObject
     [Header("곡 설명부분")]
     public string songId;                
     public string title;
-    public AudioClip audioClip;           
-                                                      
-
-    [Header("곡 BPM")]
-    public float offsetMs = 0f;           // 곡 전체 공통 오프셋
-    public float bpm;                     
+    public AudioClip audioClip;                           
 
 
     [Header("난이도별 채보")]
@@ -24,10 +19,11 @@ public class SongEntry : ScriptableObject
     [System.Serializable]
     public class ChartEntry
     {
-        public Difficulty difficulty = Difficulty.Normal; 
+        public Difficulty difficulty; 
         public TextAsset chartJson;                       
         public int level;                                 
-        public float offsetMs = 0f;                       
+        public float offsetMs = 0f;
+        public float bpm;
     }
 
     public ChartEntry GetChart(Difficulty diff)

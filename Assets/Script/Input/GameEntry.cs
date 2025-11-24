@@ -1,8 +1,9 @@
 using UnityEngine;
+using System.Linq;
 
 public class GameEntry : MonoBehaviour
 {
-    [Header("Refs")]
+    [Header("Refs - UGUI 스포너")]
     public Conductor conductor;
     public Judge judge;
     public NoteSpawner noteSpawner;     // UGUI 스포너
@@ -54,7 +55,7 @@ public class GameEntry : MonoBehaviour
 
         // 오프셋 적용
         var chart = selectedSongEntry.GetChart(selectedDifficulty);
-        conductor.userOffsetms = selectedSongEntry.offsetMs + chart.offsetMs;
+      //  conductor.userOffsetms = selectedSongEntry.offsetMs + chart.offsetMs;
 
         // 5) 재생
         conductor.music = audioSource;
