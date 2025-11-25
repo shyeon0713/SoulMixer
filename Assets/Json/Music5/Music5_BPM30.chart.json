@@ -1,0 +1,236 @@
+{
+  "title": "Music5_BPM30",
+  "totalsec": 70.734,
+  "counts": {
+    "normalL": 18,
+    "normalR": 18,
+    "long": 7,
+    "slideL": 0,
+    "slideR": 0
+  },
+  "totalLongSec": 14.0,
+  "notes": [
+    {
+      "id": 1,
+      "type": "NormalNote_L",
+      "timeSec": 0.0
+    },
+    {
+      "id": 2,
+      "type": "NormalNote_R",
+      "timeSec": 2.0
+    },
+    {
+      "id": 3,
+      "type": "NormalNote_L",
+      "timeSec": 4.0
+    },
+    {
+      "id": 4,
+      "type": "NormalNote_R",
+      "timeSec": 6.0
+    },
+    {
+      "id": 5,
+      "type": "NormalNote_L",
+      "timeSec": 8.0
+    },
+    {
+      "id": 6,
+      "type": "NormalNote_R",
+      "timeSec": 10.0
+    },
+    {
+      "id": 7,
+      "type": "NormalNote_L",
+      "timeSec": 12.0
+    },
+    {
+      "id": 37,
+      "type": "LongNote",
+      "timeSec": 12.111,
+      "durationSec": 2.0
+    },
+    {
+      "id": 8,
+      "type": "NormalNote_R",
+      "timeSec": 14.0
+    },
+    {
+      "id": 9,
+      "type": "NormalNote_L",
+      "timeSec": 16.0
+    },
+    {
+      "id": 10,
+      "type": "NormalNote_R",
+      "timeSec": 18.0
+    },
+    {
+      "id": 11,
+      "type": "NormalNote_L",
+      "timeSec": 20.0
+    },
+    {
+      "id": 38,
+      "type": "LongNote",
+      "timeSec": 20.078,
+      "durationSec": 2.0
+    },
+    {
+      "id": 12,
+      "type": "NormalNote_R",
+      "timeSec": 22.0
+    },
+    {
+      "id": 13,
+      "type": "NormalNote_L",
+      "timeSec": 24.0
+    },
+    {
+      "id": 14,
+      "type": "NormalNote_R",
+      "timeSec": 26.0
+    },
+    {
+      "id": 15,
+      "type": "NormalNote_L",
+      "timeSec": 28.0
+    },
+    {
+      "id": 39,
+      "type": "LongNote",
+      "timeSec": 28.04,
+      "durationSec": 2.0
+    },
+    {
+      "id": 16,
+      "type": "NormalNote_R",
+      "timeSec": 30.0
+    },
+    {
+      "id": 17,
+      "type": "NormalNote_L",
+      "timeSec": 32.0
+    },
+    {
+      "id": 18,
+      "type": "NormalNote_R",
+      "timeSec": 34.0
+    },
+    {
+      "id": 19,
+      "type": "NormalNote_L",
+      "timeSec": 36.0
+    },
+    {
+      "id": 40,
+      "type": "LongNote",
+      "timeSec": 36.444,
+      "durationSec": 2.0
+    },
+    {
+      "id": 20,
+      "type": "NormalNote_R",
+      "timeSec": 38.0
+    },
+    {
+      "id": 21,
+      "type": "NormalNote_L",
+      "timeSec": 40.0
+    },
+    {
+      "id": 22,
+      "type": "NormalNote_R",
+      "timeSec": 42.0
+    },
+    {
+      "id": 23,
+      "type": "NormalNote_L",
+      "timeSec": 44.0
+    },
+    {
+      "id": 41,
+      "type": "LongNote",
+      "timeSec": 44.314,
+      "durationSec": 2.0
+    },
+    {
+      "id": 24,
+      "type": "NormalNote_R",
+      "timeSec": 46.0
+    },
+    {
+      "id": 25,
+      "type": "NormalNote_L",
+      "timeSec": 48.0
+    },
+    {
+      "id": 26,
+      "type": "NormalNote_R",
+      "timeSec": 50.0
+    },
+    {
+      "id": 27,
+      "type": "NormalNote_L",
+      "timeSec": 52.0
+    },
+    {
+      "id": 42,
+      "type": "LongNote",
+      "timeSec": 52.429,
+      "durationSec": 2.0
+    },
+    {
+      "id": 28,
+      "type": "NormalNote_R",
+      "timeSec": 54.0
+    },
+    {
+      "id": 29,
+      "type": "NormalNote_L",
+      "timeSec": 56.0
+    },
+    {
+      "id": 30,
+      "type": "NormalNote_R",
+      "timeSec": 58.0
+    },
+    {
+      "id": 31,
+      "type": "NormalNote_L",
+      "timeSec": 60.0
+    },
+    {
+      "id": 43,
+      "type": "LongNote",
+      "timeSec": 60.591,
+      "durationSec": 2.0
+    },
+    {
+      "id": 32,
+      "type": "NormalNote_R",
+      "timeSec": 62.0
+    },
+    {
+      "id": 33,
+      "type": "NormalNote_L",
+      "timeSec": 64.0
+    },
+    {
+      "id": 34,
+      "type": "NormalNote_R",
+      "timeSec": 66.0
+    },
+    {
+      "id": 35,
+      "type": "NormalNote_L",
+      "timeSec": 68.0
+    },
+    {
+      "id": 36,
+      "type": "NormalNote_R",
+      "timeSec": 70.0
+    }
+  ]
+}

@@ -13,12 +13,14 @@ public class SelectMusic : MonoBehaviour
     [SerializeField] private GameObject MainUI;  // ¸ÞÀÎ UI
     [SerializeField] private GameObject Selectmusic; //¾Ç°î¼±ÅÃ UI 
     [SerializeField] private GameObject Playmusic; //¾Ç°î¿¬ÁÖ UI 
+    [SerializeField] private GameObject Result;  //Result Ã¢ ¼û±â±â
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         MainUI.SetActive(false);
         Playmusic.SetActive(false);
+        Result.SetActive(false);
     }
 
 }
