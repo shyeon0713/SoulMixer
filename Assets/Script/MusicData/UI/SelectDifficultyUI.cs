@@ -60,8 +60,17 @@ public class SelectDifficultyUI : MonoBehaviour
         hardbutton.interactable = currentSong.GetChart(Difficulty.Hard) != null;
         expertbutton.interactable = currentSong.GetChart(Difficulty.Expert) != null;
 
+        //기존 리스너 중복 제거
+        easybutton.onClick.RemoveAllListeners();
+        normalbutton.onClick.RemoveAllListeners();
+        hardbutton.onClick.RemoveAllListeners();
+        expertbutton.onClick.RemoveAllListeners();
+
+
         easybutton.onClick.AddListener(() => StartGame(Difficulty.Easy));
-        normalbutton.onClick.AddListener(() => StartGame(Difficulty.Easy));
+        normalbutton.onClick.AddListener(() => StartGame(Difficulty.Normal));
+        hardbutton.onClick.AddListener(() => StartGame(Difficulty.Hard));
+        expertbutton.onClick.AddListener(() => StartGame(Difficulty.Expert));
 
     }
 

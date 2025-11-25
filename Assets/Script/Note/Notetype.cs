@@ -4,11 +4,11 @@ using UnityEngine;
 using static UnityEngine.InputManagerEntry;
 public enum NoteType  //note타입은 총 5개
 {
-    NormalNote_R, //마우스 오른쪽 클릭_일반노트
-    NormalNote_L, //마우스 왼쪽 클릭_일반노트
-    LongNote, //마우스 휠 클릭 _ 롱노트
-    SlideNote_R, //마우스 오른쪽 슬라이드_슬라이드노트
-    SlideNote_L //마우스 왼쪽 슬라이드_슬라이드노트
+    NormalNote_R = 1, //마우스 오른쪽 클릭_일반노트
+    NormalNote_L = 0, //마우스 왼쪽 클릭_일반노트
+    LongNote = 4, //마우스 휠 클릭 _ 롱노트
+    SlideNote_R = 3, //마우스 오른쪽 슬라이드_슬라이드노트
+    SlideNote_L = 2 //마우스 왼쪽 슬라이드_슬라이드노트
 
 }
 
@@ -20,6 +20,6 @@ public class NoteData
     public float Timesec; //판정시간(초단위)
 
     [Tooltip("Long 노트일 때만 사용 (초)")]
-    public float durationSec = 0f;
+    public float durationSec = 5f;
 
 }

@@ -7,8 +7,8 @@ public class NoteSprite : ScriptableObject
     [Header("모든 노트/롱 파츠 스프라이트를 한 리스트에 관리")]
     public List<Sprite> noteSprites = new();
 
-    [Header("노트 타입 → 스프라이트 인덱스 매핑 총 4가지")]
-    public int[] indexMap = new int[4] { 0, 1, 2, 3 };
+    [Header("노트 타입 → 스프라이트 인덱스 매핑 총 5가지")]
+    public int[] indexMap = new int[5] { 0, 1, 2, 3, 4 };
 
     [Header("롱노트 파츠 인덱스 (noteSprites 기준)")]
     public int longHeadIndex = 5;
@@ -21,11 +21,21 @@ public class NoteSprite : ScriptableObject
 
     public Sprite GetSprite(NoteType type)
     {
-        if (indexMap == null || indexMap.Length < 5 || noteSprites == null || noteSprites.Count == 0)
+        if (indexMap == null || noteSprites == null || noteSprites.Count == 0)
             return fallbackSprite;
 
-        int idx = indexMap[(int)type];
-        return (idx >= 0 && idx < noteSprites.Count) ? noteSprites[idx] : fallbackSprite;
+        int t = (int)type;
+
+        // enum 값이 0~4 범위인지 검사
+        if (t < 0 || t >= indexMap.Length)
+            return fallbackSprite;
+
+        int idx = indexMap[t];
+
+        if (idx < 0 || idx >= noteSprites.Count)
+            return fallbackSprite;
+
+        return noteSprites[idx];
     }
 
     #region- 롱노트
@@ -48,7 +58,7 @@ public class NoteSprite : ScriptableObject
         if (indexMap == null || indexMap.Length != 4)
         {
             var old = indexMap;
-            indexMap = new int[4] { 0, 1, 2, 3};
+            indexMap = new int[5] { 0, 1, 2, 3,4};
             if (old != null)
             {
                 for (int i = 0; i < Mathf.Min(old.Length, 5); i++)

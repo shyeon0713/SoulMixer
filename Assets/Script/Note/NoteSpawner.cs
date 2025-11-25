@@ -1,63 +1,74 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 public class NoteSpawner : MonoBehaviour
 {
     [Header("Refs")]
-    public Conductor conductor;               // DSP ½Ã°£ ±âÁØ
+    public Conductor conductor;               // DSP ì‹œê°„ ê¸°ì¤€
     public NoteSprite spriteSet;            // ScriptableObject(= NoteSprite)
-    public RectTransform noteLayer;           // ³ëÆ®µéÀÌ ºÙÀ» ºÎ¸ğ(Canvas ÇÏÀ§)
+    public RectTransform noteLayer;           // ë…¸íŠ¸ë“¤ì´ ë¶™ì„ ë¶€ëª¨(Canvas í•˜ìœ„)
 
     [Header("Prefabs (UGUI)")]
-    public RectTransform singleNotePrefab;    // Image 1ÀåÂ¥¸®(ÅÇ/½½¶óÀÌµå)
-    public LongNoteView longNotePrefab;       // Head/Body/Tail µé¾îÀÖ´Â ÇÁ¸®ÆÕ
+    public RectTransform singleNotePrefab;    // Image 1ì¥ì§œë¦¬(íƒ­/ìŠ¬ë¼ì´ë“œ)
+    public LongNoteView longNotePrefab;       // Head/Body/Tail ë“¤ì–´ìˆëŠ” í”„ë¦¬íŒ¹
 
     [Header("Scroll")]
-    public float scrollSpeedPx = 100f;        // px/sec (À§¿¡¼­ ¾Æ·¡·Î)
-    public float spawnLeadTimeSec = 2.0f;     // ¸î ÃÊ ¾ÕÀÇ ³ëÆ®¸¦ ¹Ì¸® »ı¼º
-    public float despawnLagSec = 1.0f;        // Áö³ª°£ ÈÄ È¸¼ö Áö¿¬
+    public float spawnLeadTimeSec = 2.0f;     // ëª‡ ì´ˆ ì•ì˜ ë…¸íŠ¸ë¥¼ ë¯¸ë¦¬ ìƒì„±
+    public float despawnLagSec = 1.0f;        // ì§€ë‚˜ê°„ í›„ íšŒìˆ˜ ì§€ì—°
 
     [Header("Pooling")]
     public int initialSinglePool = 64;
     public int initialLongPool = 16;
 
     private NoteData[] _notes;
-    private int _nextSpawn; // ´ÙÀ½¿¡ ½ºÆùÇÒ ³ëÆ® ÀÎµ¦½º
+    private int _nextSpawn; // ë‹¤ìŒì— ìŠ¤í°í•  ë…¸íŠ¸ ì¸ë±ìŠ¤
 
     private readonly List<ActiveItem> _active = new();
     private readonly Stack<RectTransform> _singlePool = new();
     private readonly Stack<LongNoteView> _longPool = new();
 
+    [Header("ë…¸íŠ¸ ìƒì„± ìœ„ì¹˜")]
+    public float spawnStartX = -380f; // ì˜¤ë¥¸ìª½ ìƒë‹¨ì— ìƒì„±
+
+    [Header("ë…¸íŠ¸ íŒì •")]
+    public float judgex = 1000f;  //ë…¸íŠ¸ íŒì • ì„ 
+    public float scrollSpeedPx = 300f;  // í•œ ì´ˆì— ëª‡ px ì´ë™
+
+
     struct ActiveItem
     {
         public NoteData data;
-        public RectTransform rect;  // ½Ì±Û
-        public LongNoteView longView; // ·Õ
+        public RectTransform rect;  // ì‹±ê¸€
+        public LongNoteView longView; // ë¡±
         public bool isLong;
     }
 
-    #region JsonÆÄÀÏ ·Îµå
+    #region JsoníŒŒì¼ ë¡œë“œ
     public void LoadChart(NoteData[] notes)
     {
         _notes = notes;
         _nextSpawn = 0;
 
-        // Ç® ÃÊ±âÈ­(ÃÖÃÊ 1È¸¸¸ ÇÏ°í ½Í´Ù¸é Á¶°Ç ºĞ±â)
+        // í’€ ì´ˆê¸°í™”(ìµœì´ˆ 1íšŒë§Œ í•˜ê³  ì‹¶ë‹¤ë©´ ì¡°ê±´ ë¶„ê¸°)
         WarmupPools();
-        Debug.Log($"[NoteSpawner] LoadChart: notes = {(_notes == null ? 0 : _notes.Length)}");
+
+        // ë””ë²„ê¹…
+        Debug.Log($"[NoteSpawner] LoadChart: notes = {_notes.Length}");
+
     }
     #endregion
 
+    #region - í’€ë§ 
     void WarmupPools()
     {
-        //³ëÆ® ÀÎ½ÄÀÌ µÇ´ÂÁö È®ÀÎ
+        //ë…¸íŠ¸ ì¸ì‹ì´ ë˜ëŠ”ì§€ í™•ì¸
         if (singleNotePrefab == null || noteLayer == null)
         {
-            Debug.LogWarning("[NoteSpawner] WarmupPools: prefab ¶Ç´Â noteLayer°¡ ºñ¾î ÀÖÀ½");
+            Debug.LogWarning("[NoteSpawner] WarmupPools: prefab ë˜ëŠ” noteLayerê°€ ë¹„ì–´ ìˆìŒ");
             return;
         }
 
-        //½Ì±Û ³ëÆ®
+        //ì‹±ê¸€ ë…¸íŠ¸
         for (int i = _singlePool.Count; i < initialSinglePool; i++)
         {
             var inst = Instantiate(singleNotePrefab, noteLayer);
@@ -65,7 +76,7 @@ public class NoteSpawner : MonoBehaviour
             _singlePool.Push(inst);
         }
 
-        // ·Õ ³ëÆ®
+        // ë¡± ë…¸íŠ¸
         if (longNotePrefab != null)
         {
             for (int i = _longPool.Count; i < initialLongPool; i++)
@@ -76,51 +87,53 @@ public class NoteSpawner : MonoBehaviour
             }
         }
     }
+    #endregion
 
-   
+
     void Update()
     {
         if (_notes == null) 
             return;
 
-        //µğ¹ö±ë È®ÀÎ
+        //ë””ë²„ê¹… í™•ì¸
         if(conductor == null)
         {
-            Debug.LogWarning("[NoteSpawner] Update: conductor°¡ ºñ¾î ÀÖ¾î¼­ ½ºÆù ¾È ÇÔ");
+            Debug.LogWarning("[NoteSpawner] Update: conductorê°€ ë¹„ì–´ ìˆì–´ì„œ ìŠ¤í° ì•ˆ í•¨");
             return;
         }
         if (noteLayer == null)
         {
-            Debug.LogWarning("[NoteSpawner] Update: noteLayer°¡ ºñ¾î ÀÖ¾î¼­ ½ºÆù ¾È ÇÔ");
+            Debug.LogWarning("[NoteSpawner] Update: noteLayerê°€ ë¹„ì–´ ìˆì–´ì„œ ìŠ¤í° ì•ˆ í•¨");
             return;
         }
         if (singleNotePrefab == null)
         {
-            Debug.LogWarning("[NoteSpawner] Update: singleNotePrefabÀÌ ºñ¾î ÀÖ¾î¼­ ½ºÆù ¾È ÇÔ");
+            Debug.LogWarning("[NoteSpawner] Update: singleNotePrefabì´ ë¹„ì–´ ìˆì–´ì„œ ìŠ¤í° ì•ˆ í•¨");
             return;
         }
-        //µğ¹ö±ë
+        //ë””ë²„ê¹…
 
         float now = conductor.NowSec;
 
-        // 1) ½ºÆù(¸®µåÅ¸ÀÓ)
+        
         while (_nextSpawn < _notes.Length && (_notes[_nextSpawn].Timesec - now) <= spawnLeadTimeSec)
         {
+            Debug.Log($"[NoteSpawner] ì¡°ê±´ ë§Œì¡± -> index={_nextSpawn}, hit={_notes[_nextSpawn].Timesec}, now={now}");
             SpawnOne(_notes[_nextSpawn]);
             _nextSpawn++;
         }
 
-        // 2) À§Ä¡ °»½Å & È¸¼ö
+
         for (int i = _active.Count - 1; i >= 0; i--)
         {
             var item = _active[i];
 
-            if (item.isLong)
+            if (item.isLong)  // ë¡±ë…¸íŠ¸ ë¶€ë¶„
             {
-                // ·Õ³ëÆ®´Â ÀÚÃ¼ UpdateVisual »ç¿ë
+               
                 item.longView.UpdateVisual(now);
 
-                // È¸¼ö ½ÃÁ¡: ·Õ³ëÆ® ³¡ + despawnLagSec
+                
                 float endTime = item.data.Timesec + item.data.durationSec;
                 if (now > endTime + despawnLagSec)
                 {
@@ -128,13 +141,14 @@ public class NoteSpawner : MonoBehaviour
                     _active.RemoveAt(i);
                 }
             }
-            else
+            else   //ì¼ë°˜ ë…¸íŠ¸ ë¶€ë¶„ 
             {
-                // ½Ì±Û: y = (hitTime - now)*speed
-                float y = (item.data.Timesec - now) * scrollSpeedPx;
-                item.rect.anchoredPosition = new Vector2(item.rect.anchoredPosition.x, y);
 
-                // È¸¼ö: Áö³ª°£ ÈÄ despawnLagSec
+                float progress = (now - item.data.Timesec) * scrollSpeedPx;
+                float x = spawnStartX + progress; // ì¶œë°œì  â†’ íŒì •ì„  ë„ì°©
+
+                item.rect.anchoredPosition = new Vector2(x,item.rect.anchoredPosition.y);
+
                 if (now > item.data.Timesec + despawnLagSec)
                 {
                     RecycleSingle(item.rect);
@@ -144,24 +158,27 @@ public class NoteSpawner : MonoBehaviour
         }
     }
 
+    #region - ë…¸íŠ¸ ìƒì„±
     void SpawnOne(NoteData n)
     {
+        Debug.Log($"[NoteSpawner] SpawnOne id={n.id}, time={n.Timesec}, type={n.type}");
+
         bool isLong = (n.type == NoteType.LongNote);
 
-        float x = 0f;  //·¹ÀÎÀº ÀÏ´Ü 0À¸·Î ÁöÁ¤
+   
 
         if (isLong)
         {
             var view = GetLong();
             view.gameObject.SetActive(true);
 
-            // ·Õ³ëÆ® ÆÄ¶ó¹ÌÅÍ ÁÖÀÔ
+            
             view.spriteSet = spriteSet;
             view.scrollSpeed = scrollSpeedPx;
             view.startTimeSec = n.Timesec;
             view.durationSec = n.durationSec;
 
-            // Ã¹ ÇÁ·¹ÀÓ À§Ä¡ º¸Á¤
+          
             view.UpdateVisual(conductor.NowSec);
 
             _active.Add(new ActiveItem
@@ -178,17 +195,21 @@ public class NoteSpawner : MonoBehaviour
             rect.gameObject.SetActive(true);
             rect.SetParent(noteLayer, false);
 
-            // ½ºÇÁ¶óÀÌÆ® Àû¿ë
-            var img = rect.GetComponent<Image>();
+            // ìŠ¤í”„ë¼ì´íŠ¸ ì ìš©
+            var img = rect.GetComponentInChildren<Image>();
             if (img != null && spriteSet != null)
             {
-                img.sprite = spriteSet.GetSprite(n.type);
-                // ÇÊ¿ä½Ã °íÁ¤ Æø/³ôÀÌ·Î: img.SetNativeSize();
+                var sp = spriteSet.GetSprite(n.type);
+                if (sp == null)
+                    Debug.LogWarning($"[NoteSpawner] ìŠ¤í”„ë¼ì´íŠ¸ ì—†ìŒ: {n.type}");
+                else
+                    img.sprite = sp;
             }
+          
 
-            // X/Y ÃÊ±â ¹èÄ¡
-            float y = (n.Timesec - conductor.NowSec) * scrollSpeedPx;
-            rect.anchoredPosition = new Vector2(0, y);
+            // ë…¸íŠ¸ ìƒì„± í›„
+            float x = judgex + (conductor.NowSec - n.Timesec) * scrollSpeedPx;
+            rect.anchoredPosition = new Vector2(x, 0f);
 
             _active.Add(new ActiveItem
             {
@@ -199,6 +220,7 @@ public class NoteSpawner : MonoBehaviour
             });
         }
     }
+    #endregion
 
     RectTransform GetSingle()
     {

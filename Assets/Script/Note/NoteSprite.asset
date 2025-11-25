@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: NoteSprite
   m_EditorClassIdentifier: 
   noteSprites:
-  - {fileID: 21300000, guid: 0887e3522ebfcdf44a4c13d4bfeb83e7, type: 3}
-  - {fileID: 21300000, guid: 94d370babe49ee14da42e691f6ba6e08, type: 3}
   - {fileID: 21300000, guid: fe64caddaad9c8e468b92c1bcee37c15, type: 3}
   - {fileID: 21300000, guid: 04425e25ff3d54f4687d6a5f0fb98029, type: 3}
+  - {fileID: 21300000, guid: e9ed900eb2954694bb654efc9f222a1c, type: 3}
+  - {fileID: 21300000, guid: da36739b2e25ff043a898688cf575239, type: 3}
   - {fileID: 21300000, guid: b63fff610ca3eed44b380cd6ba0376f4, type: 3}
-  - {fileID: 21300000, guid: b99b07f7eb7de3c48af68f04afd2df64, type: 3}
-  - {fileID: 21300000, guid: 68d1c7927b4d8b148af192353d7fedef, type: 3}
+  - {fileID: 21300000, guid: 88ff98600e156e1458a67f4d73dd0929, type: 3}
+  - {fileID: 21300000, guid: 3e0499df7922db84c881019dad5efd5b, type: 3}
   indexMap: 00000000010000000200000003000000
   longHeadIndex: 4
   longBodyIndex: 5
   longTailIndex: 6
-  fallbackSprite: {fileID: 21300000, guid: 68d1c7927b4d8b148af192353d7fedef, type: 3}
+  fallbackSprite: {fileID: 21300000, guid: fe64caddaad9c8e468b92c1bcee37c15, type: 3}

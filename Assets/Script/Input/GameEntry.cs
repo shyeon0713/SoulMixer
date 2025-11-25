@@ -17,7 +17,7 @@ public class GameEntry : MonoBehaviour
     void Start()
     {
         Debug.Log("[GameEntry] Start 호출");
-        InitAndPlay();
+       // InitAndPlay();
     }
 
     // 버튼에서 호출할 초기화 + 재생
