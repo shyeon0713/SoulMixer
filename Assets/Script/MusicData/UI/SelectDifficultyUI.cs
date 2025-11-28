@@ -20,61 +20,70 @@ public class SelectDifficultyUI : MonoBehaviour
     public GameObject PlayUI;  // 플레이창
 
 
-    public void Start()
+     void Start()
     {
+        DisableAll();
+    }
+
+    #region - 버튼 전부 비활성화
+    void DisableAll() 
+    {
+        currentSong = null;
+
         easybutton.interactable = false;  //interactable = false 클릭불가 상태 설정
         normalbutton.interactable = false;
         hardbutton.interactable = false;
         expertbutton.interactable = false;
-         
+
         easybutton.image.color = Color.gray;   // 비활성화 및 회색으로 설정
         normalbutton.image.color = Color.gray;
         hardbutton.image.color = Color.gray;
         expertbutton.image.color = Color.gray;
+
     }
-    #region  - 시작 설정
+    #endregion
+
+
+    #region - 선택 곡목록이 바뀔 경우, 이전에 선택한 설정 전부 비활성화
+    public void ResetDifficulty()
+    {
+        DisableAll();   
+        
+    }
+    #endregion
+
+
+    #region  - 시작 설정 + 난이도 설정도 추가하는 방식으로 수정 
     public void Open(SongEntry song)
     {
         currentSong = song;
         gameObject.SetActive(true);
 
-        easybutton.interactable = true;  //interactable = false 클릭불가 상태 설정
-        normalbutton.interactable = true;
-        hardbutton.interactable = true;
-        expertbutton.interactable = true;
-
-        easybutton.image.color = Color.white;   // 비활성화 및 회색으로 설정
-        normalbutton.image.color = Color.white;
-        hardbutton.image.color = Color.white;
-        expertbutton.image.color = Color.white;
-
-        SetButton();  // 버튼 선택
-    }
-    #endregion
-
-    #region - 난이도 버튼 설정
-    void SetButton()
-    {
         easybutton.interactable = currentSong.GetChart(Difficulty.Easy) != null;
         normalbutton.interactable = currentSong.GetChart(Difficulty.Normal) != null;
         hardbutton.interactable = currentSong.GetChart(Difficulty.Hard) != null;
         expertbutton.interactable = currentSong.GetChart(Difficulty.Expert) != null;
 
-        //기존 리스너 중복 제거
+        easybutton.image.color = easybutton.interactable ? Color.white : Color.gray;
+        normalbutton.image.color = normalbutton.interactable ? Color.white : Color.gray;
+        hardbutton.image.color = hardbutton.interactable ? Color.white : Color.gray;
+        expertbutton.image.color = expertbutton.interactable ? Color.white : Color.gray;
+
+        // 리스너 중복 제거
         easybutton.onClick.RemoveAllListeners();
         normalbutton.onClick.RemoveAllListeners();
         hardbutton.onClick.RemoveAllListeners();
         expertbutton.onClick.RemoveAllListeners();
 
 
+        // 난이도별로 StartGame 연결
         easybutton.onClick.AddListener(() => StartGame(Difficulty.Easy));
         normalbutton.onClick.AddListener(() => StartGame(Difficulty.Normal));
         hardbutton.onClick.AddListener(() => StartGame(Difficulty.Hard));
         expertbutton.onClick.AddListener(() => StartGame(Difficulty.Expert));
-
     }
-
     #endregion
+
     void StartGame(Difficulty diff)
     {
         gameEntry.selectedSongEntry = currentSong;

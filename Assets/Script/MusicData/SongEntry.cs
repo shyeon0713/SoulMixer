@@ -10,7 +10,7 @@ public class SongEntry : ScriptableObject
     [Header("곡 설명부분")]
     public string songId;                
     public string title;
-    public AudioClip audioClip;                           
+    public AudioClip audioClip;
 
 
     [Header("난이도별 채보")]
