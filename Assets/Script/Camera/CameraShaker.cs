@@ -5,12 +5,10 @@ public class CameraShaker : MonoBehaviour
 {
     public static CameraShaker instance; // ½Ì±ÛÅæ »ý¼º
 
-    private Vector3 originalPos;
 
     void Awake()
     {
         instance = this;
-        originalPos = transform.localPosition;
     }
 
     public void Shake(float duration = 0.1f, float magnitude = 0.1f)
@@ -21,12 +19,13 @@ public class CameraShaker : MonoBehaviour
 
     IEnumerator ShakeRoutine(float duration, float magnitude)
     {
+        Vector3 originalPos = transform.localPosition;
         float time = 0f;
 
         while (time < duration)
         {
-            float x = Random.Range(-1f, 1f) * magnitude; 
-            float y = Random.Range(-1f, 1f) * magnitude;
+            float x = Random.Range(-6f, 6f) * magnitude; 
+            float y = Random.Range(-3f, 3f) * magnitude;
 
             transform.localPosition = originalPos + new Vector3(x, y, 0); // Ä«¸Þ¶ó ½¦ÀÌÅ©
             time += Time.deltaTime;

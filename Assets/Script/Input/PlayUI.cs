@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class PlayUI : MonoBehaviour
 {
@@ -25,7 +26,7 @@ public class PlayUI : MonoBehaviour
     [SerializeField] private float missLoss = 0.10f;
 
     private float sildervalue = 0f;
-
+    private Coroutine fillRoutine;
 
     private int combo;
     private int maxCombo;
@@ -68,21 +69,21 @@ public class PlayUI : MonoBehaviour
         {
             case HitGrade.Perfect:
                 Addscore(perfectGain); // 게이지 점수 추가
-                comboText.text = ToString(); // 콤보 텍스트 출력
+                comboText.text = combo.ToString(); // 콤보 텍스트 출력
                 combo++; // 점수 추가
                 judgeimage.sprite = customerimg[0]; // 이미지 변경 -> 파란색 NPC 이미지 출력
                 break;
 
             case HitGrade.Great:
                 Addscore(greatGain); // 게이지 점수 추가
-                comboText.text = ToString(); // 콤보 텍스트 출력
+                comboText.text = combo.ToString(); // 콤보 텍스트 출력
                 combo++; // 점수 추가
                 judgeimage.sprite = customerimg[0]; // 이미지 변경 -> 파란색 NPC 이미지 출력
                 break;
 
             case HitGrade.Good:
                 Addscore(goodGain); // 게이지 점수 추가
-                comboText.text = ToString(); // 콤보 텍스트 출력
+                comboText.text = combo.ToString(); // 콤보 텍스트 출력
                 combo++; // 점수 추가
                 judgeimage.sprite = customerimg[0]; // 이미지 변경 -> 파란색 NPC 이미지 출력
                 break;
@@ -107,20 +108,40 @@ public class PlayUI : MonoBehaviour
         if (CameraShaker.instance != null)
             CameraShaker.instance.Shake(0.15f, 0.2f);
 
+        if (sildervalue > 0)  // 게이지 점수가 0일때만 변화
+        {
+            Addscore(-missLoss); // 게이지 점수 추가
+        }
+
     }
     #endregion
 
 
-    #region - 게이지 업데이트 함수 
+    #region - 게이지 업데이트 함수 / 코루틴 기반으로 게이지 채움
     private void Addscore(float delta)
     {
         sildervalue += delta;
         sildervalue = Mathf.Clamp01(sildervalue);    // 0에서 1사이의 값으로 제한
 
-        if(scoreSlider != null)
+        if(fillRoutine != null)
         {
-            scoreSlider.value = sildervalue;
+            StopCoroutine(fillRoutine);
         }
+
+        fillRoutine = StartCoroutine(Fill());
+    }
+    #endregion
+
+    #region - 게이지 채우는 코루틴
+    private IEnumerator Fill()
+    {
+        while (Mathf.Abs(scoreSlider.value - sildervalue) > 0.001f)
+        {
+            scoreSlider.value = Mathf.Lerp(scoreSlider.value, sildervalue, Time.deltaTime * 6f);
+            yield return null;
+        }
+
+        scoreSlider.value = sildervalue;
     }
 
     #endregion
