@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 using System.Collections.Generic;
 
 public class PlayUI : MonoBehaviour
@@ -11,8 +12,20 @@ public class PlayUI : MonoBehaviour
     [Header("UI부분")]
     [SerializeField] private TMP_Text comboText; // 콤보 효과 텍스트
     [SerializeField] private Slider scoreSlider; // 점수 슬라이더
-    [SerializeField] private List<Image> customerimg; // 현재 손님반응 이미지
+    [SerializeField] private Image judgeimage;
+
+
+    [SerializeField] private List<Sprite> customerimg; // 현재 손님반응 이미지
     // 평온 불안 분노로 구분
+
+    [Header("게이지 증가/감소량")]
+    [SerializeField] private float perfectGain = 0.08f;
+    [SerializeField] private float greatGain = 0.05f;
+    [SerializeField] private float goodGain = 0.02f;
+    [SerializeField] private float missLoss = 0.10f;
+
+    private float sildervalue = 0f;
+
 
     private int combo;
     private int maxCombo;
@@ -22,22 +35,93 @@ public class PlayUI : MonoBehaviour
     //판정별 카운트
     private Dictionary<HitGrade, int> _gradeCounts = new Dictionary<HitGrade, int>();
 
-     void Awake()
+     void OnEnable()
     {
-       if(judge == null)
+        if(judge != null)
         {
-            Debug.Log("judge 참조가 비어있음");
-            return;
+            judge.OnHit += HandleHit;
+            judge.OnMiss += HandleMiss;
         }
 
-      //  judge.OnHit += HandleHit;
-     //   judge.OnMiss += HandleMiss;
-
-        foreach (HitGrade g in System.Enum.GetValues(typeof(HitGrade)))
+        if (scoreSlider != null)
         {
-            _gradeCounts[g] = 0;
+            scoreSlider.value = sildervalue;
         }
-        // 모든 판정 종류에 대해 _gradeCounts 딕셔너리 안에 판정값을 0으로 초기화
+            
+    }
+     void OnDisable()
+    {
+        if (judge != null)
+        {
+            judge.OnHit -= HandleHit;
+            judge.OnMiss -= HandleMiss;
+        }
+        
     }
 
+
+    #region -  // 판정 UI 처리
+
+    void HandleHit(NoteData note, HitGrade grade)
+    {
+       switch (grade)
+        {
+            case HitGrade.Perfect:
+                Addscore(perfectGain); // 게이지 점수 추가
+                comboText.text = ToString(); // 콤보 텍스트 출력
+                combo++; // 점수 추가
+                judgeimage.sprite = customerimg[0]; // 이미지 변경 -> 파란색 NPC 이미지 출력
+                break;
+
+            case HitGrade.Great:
+                Addscore(greatGain); // 게이지 점수 추가
+                comboText.text = ToString(); // 콤보 텍스트 출력
+                combo++; // 점수 추가
+                judgeimage.sprite = customerimg[0]; // 이미지 변경 -> 파란색 NPC 이미지 출력
+                break;
+
+            case HitGrade.Good:
+                Addscore(goodGain); // 게이지 점수 추가
+                comboText.text = ToString(); // 콤보 텍스트 출력
+                combo++; // 점수 추가
+                judgeimage.sprite = customerimg[0]; // 이미지 변경 -> 파란색 NPC 이미지 출력
+                break;
+
+           // case HitGrade.Miss:  // miss인 경우에는 HandleMiss에서 처리해야하는거 아닌가?
+           //     break; 
+        }
+    }
+
+    #endregion
+
+
+    #region - // 미스 UI 처리
+    void HandleMiss(NoteData note)
+    {
+        combo = 0; // 콤보 점수 리셋
+        comboText.text = "Miss";
+
+        judgeimage.sprite = customerimg[1]; // 이미지 변경  -> 빨간색 NPC 이미지로 변경
+
+        //카메라 쉐이크 -> 싱글톤을 만들어서 필요할 때 호출 : 근데 Miss때만 사용할 것 같음
+        if (CameraShaker.instance != null)
+            CameraShaker.instance.Shake(0.15f, 0.2f);
+
+    }
+    #endregion
+
+
+    #region - 게이지 업데이트 함수 
+    private void Addscore(float delta)
+    {
+        sildervalue += delta;
+        sildervalue = Mathf.Clamp01(sildervalue);    // 0에서 1사이의 값으로 제한
+
+        if(scoreSlider != null)
+        {
+            scoreSlider.value = sildervalue;
+        }
+    }
+
+    #endregion
 }
