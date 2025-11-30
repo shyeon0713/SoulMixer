@@ -111,14 +111,14 @@ public class NoteSpawner : MonoBehaviour
 
         float now = conductor.NowSec;
 
-        // 🔧 스폰 조건: 판정 시간까지 남은 시간이 spawnLeadTimeSec 이하
+        // 판정 시간까지 남은 시간이 spawnLeadTimeSec 이하
         while (_nextSpawn < _notes.Length)
         {
             float timeUntilHit = _notes[_nextSpawn].Timesec - now;
 
             if (timeUntilHit <= spawnLeadTimeSec)
             {
-                Debug.Log($"[NoteSpawner] Spawn Note[{_nextSpawn}] at {_notes[_nextSpawn].Timesec:F3}s (now={now:F3}s, lead={timeUntilHit:F3}s)");
+
                 SpawnOne(_notes[_nextSpawn]);
                 _nextSpawn++;
             }
@@ -146,7 +146,7 @@ public class NoteSpawner : MonoBehaviour
             }
             else
             {
-                // 🔧 수정: 생성 시점부터 경과한 시간 기준으로 이동
+                //  생성 시점부터 경과한 시간 기준으로 이동
                 float elapsedTime = now - item.spawnTime;
                 float x = spawnStartX + (elapsedTime * scrollSpeedPx);
 
@@ -174,8 +174,11 @@ public class NoteSpawner : MonoBehaviour
 
             view.spriteSet = spriteSet;
             view.scrollSpeed = scrollSpeedPx;
+
             view.startTimeSec = n.Timesec;
             view.durationSec = n.durationSec;
+
+            view.spawnTimeSec = conductor.NowSec;
 
             view.UpdateVisual(conductor.NowSec);
 
@@ -185,7 +188,7 @@ public class NoteSpawner : MonoBehaviour
                 longView = view,
                 rect = null,
                 isLong = true,
-                spawnTime = conductor.NowSec  // 🔧 추가
+                spawnTime = conductor.NowSec  
             });
         }
         else
@@ -199,19 +202,22 @@ public class NoteSpawner : MonoBehaviour
             if (img != null && spriteSet != null)
             {
                 var sp = spriteSet.GetSprite(n.type);
-                if (sp == null)
-                    Debug.LogWarning($"[NoteSpawner] 스프라이트 없음: {n.type}");
+                if (sp == null) { }
+                 
                 else
                     img.sprite = sp;
             }
 
-            // 🔧 수정: 노트는 왼쪽 spawnStartX에서 생성, Y는 고정
+            // 노트는 왼쪽 spawnStartX에서 생성, Y는 고정
             float x = spawnStartX;
             float y = noteY;  // 고정된 Y 위치
 
             rect.anchoredPosition = new Vector2(x, y);
+            
 
-            Debug.Log($"[NoteSpawner] Single note spawned at x={x:F1}, y={y:F1}, will hit at {n.Timesec:F3}s");
+            //노트 디버깅
+            var d = _notes[_nextSpawn];
+            Debug.Log($"[NoteSpawner] Spawn Note -> id={d.id}, type={d.type}, timeSec={d.Timesec:F3}");
 
             _active.Add(new ActiveItem
             {
@@ -219,7 +225,7 @@ public class NoteSpawner : MonoBehaviour
                 rect = rect,
                 longView = null,
                 isLong = false,
-                spawnTime = conductor.NowSec  // 🔧 추가: 현재 시간 저장
+                spawnTime = conductor.NowSec  
             });
         }
     }

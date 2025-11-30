@@ -20,11 +20,15 @@ public class Conductor : MonoBehaviour
     public double dspStart;
    public float userOffsetms = 0f;
 
+    public float startDelaySec = 3f;  //∞Ó Ω√¿€ µÙ∑π¿Ã -> 3√  µ⁄ Ω√¿€
+
     public float NowSec => (float)(AudioSettings.dspTime - dspStart) + userOffsetms / 1000f;
 
     public void PlayScheduled(double lead = 0.010)
     {
-        dspStart = AudioSettings.dspTime + lead;
+        double totalLead = lead + startDelaySec;  // µÙ∑π¿Ã√ﬂ∞°
+
+        dspStart = AudioSettings.dspTime + totalLead;
         music.PlayScheduled(dspStart);
     }
 }

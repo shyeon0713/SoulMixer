@@ -1,377 +1,606 @@
 {
-  "title": "Music1_BPM60",
-  "totalsec": 62.32,
+  "title": "Normal_BPM60_Full",
+  "totalsec": 214.081,
   "counts": {
-    "normalL": 32,
-    "normalR": 31,
-    "long": 8,
-    "slideL": 0,
-    "slideR": 0
+    "normalL": 161,
+    "normalR": 163,
+    "long": 1,
+    "slideL": 1,
+    "slideR": 2
   },
-  "totalLongSec": 16.0,
+  "totalLongSec": 0.0,
   "notes": [
     {
       "id": 1,
-      "type": "NormalNote_L",
-      "timeSec": 0.0
+      "type": "NormalNote_R",
+      "timeSec": 3.158
     },
     {
       "id": 2,
-      "type": "NormalNote_R",
-      "timeSec": 1.0
+      "type": "NormalNote_L",
+      "timeSec": 3.56
     },
     {
       "id": 3,
-      "type": "NormalNote_L",
-      "timeSec": 2.0
+      "type": "NormalNote_R",
+      "timeSec": 3.981
     },
     {
       "id": 4,
-      "type": "NormalNote_R",
-      "timeSec": 3.0
+      "type": "NormalNote_L",
+      "timeSec": 4.378
     },
     {
       "id": 5,
-      "type": "NormalNote_L",
-      "timeSec": 4.0
+      "type": "NormalNote_R",
+      "timeSec": 4.779
     },
     {
       "id": 6,
-      "type": "NormalNote_R",
-      "timeSec": 5.0
+      "type": "NormalNote_L",
+      "timeSec": 5.198
     },
     {
       "id": 7,
-      "type": "NormalNote_L",
-      "timeSec": 6.0
+      "type": "NormalNote_R",
+      "timeSec": 5.599
     },
     {
       "id": 8,
-      "type": "NormalNote_R",
-      "timeSec": 7.0
+      "type": "NormalNote_L",
+      "timeSec": 6.019
     },
     {
       "id": 9,
-      "type": "NormalNote_L",
-      "timeSec": 8.0
-    },
-    {
-      "id": 64,
-      "type": "LongNote",
-      "timeSec": 8.384,
-      "durationSec": 2.0
+      "type": "NormalNote_R",
+      "timeSec": 6.422
     },
     {
       "id": 10,
-      "type": "NormalNote_R",
-      "timeSec": 9.0
+      "type": "NormalNote_L",
+      "timeSec": 7.238
     },
     {
       "id": 11,
-      "type": "NormalNote_L",
-      "timeSec": 10.0
+      "type": "NormalNote_R",
+      "timeSec": 8.059
     },
     {
       "id": 12,
-      "type": "NormalNote_R",
-      "timeSec": 11.0
+      "type": "NormalNote_L",
+      "timeSec": 8.459
     },
     {
       "id": 13,
-      "type": "NormalNote_L",
-      "timeSec": 12.0
+      "type": "NormalNote_R",
+      "timeSec": 8.881
     },
     {
       "id": 14,
-      "type": "NormalNote_R",
-      "timeSec": 13.0
+      "type": "NormalNote_L",
+      "timeSec": 9.281
     },
     {
       "id": 15,
-      "type": "NormalNote_L",
-      "timeSec": 14.0
-    },
-    {
-      "id": 65,
-      "type": "LongNote",
-      "timeSec": 14.999,
-      "durationSec": 2.0
+      "type": "NormalNote_R",
+      "timeSec": 9.68
     },
     {
       "id": 16,
-      "type": "NormalNote_R",
-      "timeSec": 15.0
+      "type": "NormalNote_L",
+      "timeSec": 10.101
     },
     {
       "id": 17,
-      "type": "NormalNote_L",
-      "timeSec": 16.0
+      "type": "NormalNote_R",
+      "timeSec": 10.501
     },
     {
       "id": 18,
-      "type": "NormalNote_R",
-      "timeSec": 17.0
+      "type": "NormalNote_L",
+      "timeSec": 10.918
     },
     {
       "id": 19,
-      "type": "NormalNote_L",
-      "timeSec": 18.0
+      "type": "NormalNote_R",
+      "timeSec": 11.321
     },
     {
       "id": 20,
-      "type": "NormalNote_R",
-      "timeSec": 19.0
+      "type": "NormalNote_L",
+      "timeSec": 11.719
     },
     {
       "id": 21,
-      "type": "NormalNote_L",
-      "timeSec": 20.0
+      "type": "NormalNote_R",
+      "timeSec": 12.142
     },
     {
       "id": 22,
-      "type": "NormalNote_R",
-      "timeSec": 21.0
-    },
-    {
-      "id": 66,
-      "type": "LongNote",
-      "timeSec": 21.323,
-      "durationSec": 2.0
+      "type": "NormalNote_L",
+      "timeSec": 12.94
     },
     {
       "id": 23,
-      "type": "NormalNote_L",
-      "timeSec": 22.0
+      "type": "NormalNote_R",
+      "timeSec": 13.361
     },
     {
       "id": 24,
-      "type": "NormalNote_R",
-      "timeSec": 23.0
+      "type": "NormalNote_L",
+      "timeSec": 13.761
     },
     {
       "id": 25,
-      "type": "NormalNote_L",
-      "timeSec": 24.0
+      "type": "NormalNote_R",
+      "timeSec": 14.181
     },
     {
       "id": 26,
-      "type": "NormalNote_R",
-      "timeSec": 25.0
+      "type": "NormalNote_L",
+      "timeSec": 14.578
     },
     {
       "id": 27,
-      "type": "NormalNote_L",
-      "timeSec": 26.0
+      "type": "NormalNote_R",
+      "timeSec": 15.002
     },
     {
       "id": 28,
-      "type": "NormalNote_R",
-      "timeSec": 27.0
+      "type": "NormalNote_L",
+      "timeSec": 15.401
     },
     {
       "id": 29,
-      "type": "NormalNote_L",
-      "timeSec": 28.0
-    },
-    {
-      "id": 67,
-      "type": "LongNote",
-      "timeSec": 28.074,
-      "durationSec": 2.0
+      "type": "NormalNote_R",
+      "timeSec": 15.8
     },
     {
       "id": 30,
-      "type": "NormalNote_R",
-      "timeSec": 29.0
+      "type": "NormalNote_L",
+      "timeSec": 16.198
     },
     {
       "id": 31,
-      "type": "NormalNote_L",
-      "timeSec": 30.0
+      "type": "NormalNote_R",
+      "timeSec": 16.622
     },
     {
       "id": 32,
-      "type": "NormalNote_R",
-      "timeSec": 31.0
+      "type": "NormalNote_L",
+      "timeSec": 17.039
     },
     {
       "id": 33,
-      "type": "NormalNote_L",
-      "timeSec": 32.0
+      "type": "NormalNote_R",
+      "timeSec": 17.439
     },
     {
       "id": 34,
-      "type": "NormalNote_R",
-      "timeSec": 33.0
+      "type": "NormalNote_L",
+      "timeSec": 17.841
     },
     {
       "id": 35,
-      "type": "NormalNote_L",
-      "timeSec": 34.0
-    },
-    {
-      "id": 68,
-      "type": "LongNote",
-      "timeSec": 34.384,
-      "durationSec": 2.0
+      "type": "NormalNote_R",
+      "timeSec": 18.261
     },
     {
       "id": 36,
-      "type": "NormalNote_R",
-      "timeSec": 35.0
+      "type": "NormalNote_L",
+      "timeSec": 18.661
     },
     {
       "id": 37,
-      "type": "NormalNote_L",
-      "timeSec": 36.0
+      "type": "NormalNote_R",
+      "timeSec": 19.078
     },
     {
       "id": 38,
-      "type": "NormalNote_R",
-      "timeSec": 37.0
+      "type": "NormalNote_L",
+      "timeSec": 19.479
     },
     {
       "id": 39,
-      "type": "NormalNote_L",
-      "timeSec": 38.0
+      "type": "NormalNote_R",
+      "timeSec": 19.88
     },
     {
       "id": 40,
-      "type": "NormalNote_R",
-      "timeSec": 39.0
+      "type": "NormalNote_L",
+      "timeSec": 20.301
     },
     {
       "id": 41,
-      "type": "NormalNote_L",
-      "timeSec": 40.0
-    },
-    {
-      "id": 69,
-      "type": "LongNote",
-      "timeSec": 40.796,
-      "durationSec": 2.0
+      "type": "NormalNote_R",
+      "timeSec": 20.698
     },
     {
       "id": 42,
-      "type": "NormalNote_R",
-      "timeSec": 41.0
+      "type": "NormalNote_L",
+      "timeSec": 21.099
     },
     {
       "id": 43,
-      "type": "NormalNote_L",
-      "timeSec": 42.0
+      "type": "NormalNote_R",
+      "timeSec": 21.522
     },
     {
       "id": 44,
-      "type": "NormalNote_R",
-      "timeSec": 43.0
+      "type": "NormalNote_L",
+      "timeSec": 21.92
     },
     {
       "id": 45,
-      "type": "NormalNote_L",
-      "timeSec": 44.0
+      "type": "NormalNote_R",
+      "timeSec": 22.741
     },
     {
       "id": 46,
-      "type": "NormalNote_R",
-      "timeSec": 45.0
+      "type": "NormalNote_L",
+      "timeSec": 23.16
     },
     {
       "id": 47,
-      "type": "NormalNote_L",
-      "timeSec": 46.0
+      "type": "NormalNote_R",
+      "timeSec": 23.562
     },
     {
       "id": 48,
-      "type": "NormalNote_R",
-      "timeSec": 47.0
-    },
-    {
-      "id": 70,
-      "type": "LongNote",
-      "timeSec": 47.558,
-      "durationSec": 2.0
+      "type": "NormalNote_L",
+      "timeSec": 23.98
     },
     {
       "id": 49,
-      "type": "NormalNote_L",
-      "timeSec": 48.0
+      "type": "NormalNote_R",
+      "timeSec": 24.38
     },
     {
       "id": 50,
-      "type": "NormalNote_R",
-      "timeSec": 49.0
+      "type": "NormalNote_L",
+      "timeSec": 24.78
     },
     {
       "id": 51,
-      "type": "NormalNote_L",
-      "timeSec": 50.0
+      "type": "NormalNote_R",
+      "timeSec": 25.2
     },
     {
       "id": 52,
-      "type": "NormalNote_R",
-      "timeSec": 51.0
+      "type": "NormalNote_L",
+      "timeSec": 26.82
     },
     {
       "id": 53,
-      "type": "NormalNote_L",
-      "timeSec": 52.0
+      "type": "NormalNote_R",
+      "timeSec": 27.241
     },
     {
       "id": 54,
-      "type": "NormalNote_R",
-      "timeSec": 53.0
-    },
-    {
-      "id": 71,
-      "type": "LongNote",
-      "timeSec": 53.986,
-      "durationSec": 2.0
+      "type": "NormalNote_L",
+      "timeSec": 27.638
     },
     {
       "id": 55,
-      "type": "NormalNote_L",
-      "timeSec": 54.0
+      "type": "NormalNote_R",
+      "timeSec": 28.459
     },
     {
       "id": 56,
-      "type": "NormalNote_R",
-      "timeSec": 55.0
+      "type": "NormalNote_L",
+      "timeSec": 29.281
     },
     {
       "id": 57,
-      "type": "NormalNote_L",
-      "timeSec": 56.0
+      "type": "NormalNote_R",
+      "timeSec": 30.082
     },
     {
       "id": 58,
-      "type": "NormalNote_R",
-      "timeSec": 57.0
+      "type": "NormalNote_L",
+      "timeSec": 30.9
     },
     {
       "id": 59,
-      "type": "NormalNote_L",
-      "timeSec": 58.0
+      "type": "NormalNote_R",
+      "timeSec": 31.722
     },
     {
       "id": 60,
-      "type": "NormalNote_R",
-      "timeSec": 59.0
+      "type": "NormalNote_L",
+      "timeSec": 32.122
     },
     {
       "id": 61,
-      "type": "NormalNote_L",
-      "timeSec": 60.0
+      "type": "NormalNote_R",
+      "timeSec": 32.54
     },
     {
       "id": 62,
-      "type": "NormalNote_R",
-      "timeSec": 61.0
+      "type": "NormalNote_L",
+      "timeSec": 33.36
     },
     {
       "id": 63,
+      "type": "NormalNote_R",
+      "timeSec": 33.758
+    },
+    {
+      "id": 64,
+      "type": "NormalNote_R",
+      "timeSec": 34.98
+    },
+    {
+      "id": 65,
       "type": "NormalNote_L",
-      "timeSec": 62.0
+      "timeSec": 35.399
+    },
+    {
+      "id": 66,
+      "type": "NormalNote_R",
+      "timeSec": 36.22
+    },
+    {
+      "id": 67,
+      "type": "NormalNote_L",
+      "timeSec": 36.619
+    },
+    {
+      "id": 68,
+      "type": "NormalNote_R",
+      "timeSec": 37.02
+    },
+    {
+      "id": 69,
+      "type": "NormalNote_L",
+      "timeSec": 37.839
+    },
+    {
+      "id": 70,
+      "type": "NormalNote_R",
+      "timeSec": 37.839
+    },
+    {
+      "id": 71,
+      "type": "SlideR",
+      "timeSec": 39.062
+    },
+    {
+      "id": 72,
+      "type": "NormalNote_L",
+      "timeSec": 41.92
+    },
+    {
+      "id": 73,
+      "type": "NormalNote_L",
+      "timeSec": 42.339
+    },
+    {
+      "id": 74,
+      "type": "NormalNote_R",
+      "timeSec": 43.142
+    },
+    {
+      "id": 75,
+      "type": "NormalNote_L",
+      "timeSec": 43.959
+    },
+    {
+      "id": 76,
+      "type": "NormalNote_L",
+      "timeSec": 44.78
+    },
+    {
+      "id": 77,
+      "type": "NormalNote_R",
+      "timeSec": 45.581
+    },
+    {
+      "id": 78,
+      "type": "NormalNote_L",
+      "timeSec": 46.398
+    },
+    {
+      "id": 79,
+      "type": "NormalNote_R",
+      "timeSec": 46.819
+    },
+    {
+      "id": 80,
+      "type": "NormalNote_L",
+      "timeSec": 48.04
+    },
+    {
+      "id": 81,
+      "type": "NormalNote_R",
+      "timeSec": 48.462
+    },
+    {
+      "id": 82,
+      "type": "NormalNote_L",
+      "timeSec": 48.859
+    },
+    {
+      "id": 83,
+      "type": "NormalNote_R",
+      "timeSec": 49.261
+    },
+    {
+      "id": 84,
+      "type": "NormalNote_L",
+      "timeSec": 49.681
+    },
+    {
+      "id": 85,
+      "type": "NormalNote_R",
+      "timeSec": 50.08
+    },
+    {
+      "id": 86,
+      "type": "NormalNote_R",
+      "timeSec": 50.498
+    },
+    {
+      "id": 87,
+      "type": "NormalNote_L",
+      "timeSec": 50.899
+    },
+    {
+      "id": 88,
+      "type": "NormalNote_L",
+      "timeSec": 51.301
+    },
+    {
+      "id": 89,
+      "type": "NormalNote_L",
+      "timeSec": 52.118
+    },
+    {
+      "id": 90,
+      "type": "NormalNote_R",
+      "timeSec": 52.118
+    },
+    {
+      "id": 91,
+      "type": "SlideR",
+      "timeSec": 55.0
+    },
+    {
+      "id": 92,
+      "type": "SlideL",
+      "timeSec": 55.399
+    },
+    {
+      "id": 93,
+      "type": "NormalNote_R",
+      "timeSec": 56.219
+    },
+    {
+      "id": 94,
+      "type": "NormalNote_L",
+      "timeSec": 57.019
+    },
+    {
+      "id": 95,
+      "type": "NormalNote_R",
+      "timeSec": 57.841
+    },
+    {
+      "id": 96,
+      "type": "NormalNote_L",
+      "timeSec": 58.66
+    },
+    {
+      "id": 97,
+      "type": "NormalNote_R",
+      "timeSec": 59.48
+    },
+    {
+      "id": 98,
+      "type": "NormalNote_L",
+      "timeSec": 59.88
+    },
+    {
+      "id": 99,
+      "type": "NormalNote_R",
+      "timeSec": 60.281
+    },
+    {
+      "id": 100,
+      "type": "NormalNote_L",
+      "timeSec": 60.7
+    },
+    {
+      "id": 101,
+      "type": "NormalNote_R",
+      "timeSec": 61.102
+    },
+    {
+      "id": 102,
+      "type": "NormalNote_L",
+      "timeSec": 61.521
+    },
+    {
+      "id": 103,
+      "type": "NormalNote_R",
+      "timeSec": 61.921
+    },
+    {
+      "id": 104,
+      "type": "NormalNote_L",
+      "timeSec": 62.739
+    },
+    {
+      "id": 105,
+      "type": "NormalNote_R",
+      "timeSec": 63.139
+    },
+    {
+      "id": 106,
+      "type": "NormalNote_L",
+      "timeSec": 63.562
+    },
+    {
+      "id": 107,
+      "type": "NormalNote_R",
+      "timeSec": 63.961
+    },
+    {
+      "id": 108,
+      "type": "NormalNote_L",
+      "timeSec": 64.379
+    },
+    {
+      "id": 109,
+      "type": "NormalNote_L",
+      "timeSec": 65.182
+    },
+    {
+      "id": 110,
+      "type": "NormalNote_R",
+      "timeSec": 65.182
+    },
+    {
+      "id": 111,
+      "type": "NormalNote_L",
+      "timeSec": 66.001
+    },
+    {
+      "id": 112,
+      "type": "NormalNote_R",
+      "timeSec": 66.001
+    },
+    {
+      "id": 113,
+      "type": "NormalNote_L",
+      "timeSec": 66.819
+    },
+    {
+      "id": 114,
+      "type": "NormalNote_R",
+      "timeSec": 66.819
+    },
+    {
+      "id": 115,
+      "type": "NormalNote_R",
+      "timeSec": 67.639
+    },
+    {
+      "id": 116,
+      "type": "LongNote",
+      "timeSec": 70.901,
+      "durationSec":3.262
+    },
+    {
+      "id": 117,
+      "type": "SlideR",
+      "timeSec": 71.719
+    },
+    {
+      "id": 118,
+      "type": "SlideL",
+      "timeSec": 72.541
     }
+
   ]
 }

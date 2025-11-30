@@ -12,6 +12,7 @@ public class PlayUI : MonoBehaviour
 
     [Header("UI부분")]
     [SerializeField] private TMP_Text comboText; // 콤보 효과 텍스트
+    [SerializeField] private TMP_Text scoreText; // 점수 텍스트
     [SerializeField] private Slider scoreSlider; // 점수 슬라이더
     [SerializeField] private Image judgeimage;
 
@@ -31,7 +32,6 @@ public class PlayUI : MonoBehaviour
     private int combo;
     private int maxCombo;
 
-    private int score;
 
     //판정별 카운트
     private Dictionary<HitGrade, int> _gradeCounts = new Dictionary<HitGrade, int>();
@@ -69,23 +69,35 @@ public class PlayUI : MonoBehaviour
         {
             case HitGrade.Perfect:
                 Addscore(perfectGain); // 게이지 점수 추가
-                comboText.text = combo.ToString(); // 콤보 텍스트 출력
+
                 combo++; // 점수 추가
+                scoreText.text = combo.ToString(); // 점수 텍스트 출력
+
+                comboText.text = "Perfect!";  // Good 텍스트 출력
+
                 judgeimage.sprite = customerimg[0]; // 이미지 변경 -> 파란색 NPC 이미지 출력
                 break;
 
             case HitGrade.Great:
                 Addscore(greatGain); // 게이지 점수 추가
-                comboText.text = combo.ToString(); // 콤보 텍스트 출력
+
                 combo++; // 점수 추가
+                scoreText.text = combo.ToString(); // 점수 텍스트 출력
+
+                comboText.text = "Great!";  // Good 텍스트 출력
+
                 judgeimage.sprite = customerimg[0]; // 이미지 변경 -> 파란색 NPC 이미지 출력
                 break;
 
             case HitGrade.Good:
                 Addscore(goodGain); // 게이지 점수 추가
-                comboText.text = combo.ToString(); // 콤보 텍스트 출력
+
                 combo++; // 점수 추가
-                judgeimage.sprite = customerimg[0]; // 이미지 변경 -> 파란색 NPC 이미지 출력
+                scoreText.text = combo.ToString(); // 점수 텍스트 출력
+
+                comboText.text = "Good!";  // Good 텍스트 출력
+
+                judgeimage.sprite = customerimg[2]; // 이미지 변경 -> normal NPC 이미지 출력
                 break;
 
            // case HitGrade.Miss:  // miss인 경우에는 HandleMiss에서 처리해야하는거 아닌가?
@@ -100,7 +112,9 @@ public class PlayUI : MonoBehaviour
     void HandleMiss(NoteData note)
     {
         combo = 0; // 콤보 점수 리셋
-        comboText.text = "Miss";
+        comboText.text = "Miss";  // Miss 출력
+
+        scoreText.text = combo.ToString();
 
         judgeimage.sprite = customerimg[1]; // 이미지 변경  -> 빨간색 NPC 이미지로 변경
 

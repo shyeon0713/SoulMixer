@@ -12,9 +12,9 @@ public class Judge : MonoBehaviour
     public Conductor conductor;
 
     [Header("판정 시간의 구간의 폭 -> 절대값활용")]
-    public int perfectsMs = 22;
-    public int greatMs = 45;
-    public int goodMs = 80;
+    public int perfectsMs = 100;
+    public int greatMs = 200;
+    public int goodMs = 300;
 
     [Header("롱노트의 판정 시간의 구간읜 폭")]
     public int longStartMs = 80;
@@ -31,12 +31,15 @@ public class Judge : MonoBehaviour
     public Action<NoteData, HitGrade> OnHit;
     public Action<NoteData> OnMiss;
 
+
+    public Action OnAllNotesJudged;   // 모든 노트 판정 끝났을 때 호출
+
     // 새로운 곡 데이터를 로드할 때만 호출 (곡 선택 시)
     public void LoadChart(NoteData[] notes)
     {
         if (notes == null)
         {
-            Debug.LogError("[Judge] LoadChart: notes == null");
+       //     Debug.LogError("[Judge] LoadChart: notes == null");
             return;
         }
 
@@ -45,7 +48,7 @@ public class Judge : MonoBehaviour
         System.Array.Copy(notes, _notes, notes.Length);
         System.Array.Sort(_notes, (a, b) => a.Timesec.CompareTo(b.Timesec));
 
-        Debug.Log($"[Judge] LoadChart: {_notes.Length} notes loaded and sorted by time");
+     //   Debug.Log($"[Judge] LoadChart: {_notes.Length} notes loaded and sorted by time");
 
         // 첫 5개 노트 시간 확인 (디버깅용)
         for (int i = 0; i < Mathf.Min(5, _notes.Length); i++)
@@ -63,7 +66,7 @@ public class Judge : MonoBehaviour
         _activeLongIndex = -1;
         _consumedNotes.Clear();
 
-        Debug.Log("[Judge] Judgment reset - ready to play");
+      //  Debug.Log("[Judge] Judgment reset - ready to play");
     }
 
     float MsToSec(int ms) => ms * 0.001f;
@@ -102,7 +105,7 @@ public class Judge : MonoBehaviour
                     continue;
                 }
 
-                Debug.Log($"[Judge] Miss - Note at {_notes[_idx].Timesec:F3}s, current: {now:F3}s");
+            //    Debug.Log($"[Judge] Miss - Note at {_notes[_idx].Timesec:F3}s, current: {now:F3}s");
                 OnMiss?.Invoke(_notes[_idx]);
                 _consumedNotes.Add(_idx);
                 _idx++;
@@ -134,7 +137,7 @@ public class Judge : MonoBehaviour
         float t = (float)(inputDspTime - conductor.dspStart) + conductor.userOffsetms / 1000f;
 
         // 디버그: 입력 시간 확인
-        Debug.Log($"[Judge] Tap {type} at t={t:F3}s (input={inputDspTime:F3}, dspStart={conductor.dspStart:F3})");
+      //  Debug.Log($"[Judge] Tap {type} at t={t:F3}s (input={inputDspTime:F3}, dspStart={conductor.dspStart:F3})");
 
         // ?? 수정: t를 기준으로 정리
         CullPastNotes(t);
@@ -172,7 +175,7 @@ public class Judge : MonoBehaviour
         // 판정 처리
         if (best < 0)
         {
-            Debug.Log($"[Judge] No note found for tap at {t:F3}s");
+          //  Debug.Log($"[Judge] No note found for tap at {t:F3}s");
             OnMiss?.Invoke(new NoteData { type = type, Timesec = t });
             return;
         }
@@ -182,13 +185,13 @@ public class Judge : MonoBehaviour
 
         if (grade == HitGrade.Miss)
         {
-            Debug.Log($"[Judge] Miss - Note[{best}] at {_notes[best].Timesec:F3}s, Delta: {deltaMs:F1}ms (threshold: {goodMs}ms)");
+          //  Debug.Log($"[Judge] Miss - Note[{best}] at {_notes[best].Timesec:F3}s, Delta: {deltaMs:F1}ms (threshold: {goodMs}ms)");
             OnMiss?.Invoke(_notes[best]);
             return;
         }
 
-        // ?? 수정: 성공 판정 시 노트 소비
-        Debug.Log($"[Judge] {grade} - Note[{best}] at {_notes[best].Timesec:F3}s, Delta: {deltaMs:F1}ms");
+        //  수정: 성공 판정 시 노트 소비
+       // Debug.Log($"[Judge] {grade} - Note[{best}] at {_notes[best].Timesec:F3}s, Delta: {deltaMs:F1}ms");
         OnHit?.Invoke(_notes[best], grade);
         _consumedNotes.Add(best);
     }
@@ -229,7 +232,7 @@ public class Judge : MonoBehaviour
 
         if (best < 0 || bestDiff > w)
         {
-            Debug.Log($"[Judge] Long note start miss at {t:F3}s");
+       //    Debug.Log($"[Judge] Long note start miss at {t:F3}s");
             OnMiss?.Invoke(new NoteData { type = NoteType.LongNote, Timesec = t });
             return;
         }
@@ -239,7 +242,7 @@ public class Judge : MonoBehaviour
         _holding = true;
 
         var grade = GradeFromDelta(_activeLong.Timesec - t);
-        Debug.Log($"[Judge] Long note start {grade} at {t:F3}s");
+      //  Debug.Log($"[Judge] Long note start {grade} at {t:F3}s");
         OnHit?.Invoke(_activeLong, grade);
         _consumedNotes.Add(best);
     }
@@ -258,12 +261,12 @@ public class Judge : MonoBehaviour
         if (Mathf.Abs(endTime - t) <= w)
         {
             var grade = GradeFromDelta(endTime - t);
-            Debug.Log($"[Judge] Long note end {grade}, delta: {(endTime - t) * 1000:F1}ms");
+         //   Debug.Log($"[Judge] Long note end {grade}, delta: {(endTime - t) * 1000:F1}ms");
             OnHit?.Invoke(_activeLong, grade);
         }
         else
         {
-            Debug.Log($"[Judge] Long note end miss, delta: {(endTime - t) * 1000:F1}ms");
+        //    Debug.Log($"[Judge] Long note end miss, delta: {(endTime - t) * 1000:F1}ms");
             OnMiss?.Invoke(_activeLong);
         }
 
@@ -310,7 +313,7 @@ public class Judge : MonoBehaviour
 
         if (best < 0)
         {
-            Debug.Log($"[Judge] Slide miss - no note found at {t:F3}s");
+         //   Debug.Log($"[Judge] Slide miss - no note found at {t:F3}s");
             OnMiss?.Invoke(new NoteData { type = targetType, Timesec = t });
             return;
         }
@@ -323,9 +326,25 @@ public class Judge : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[Judge] Slide {grade} at {t:F3}s");
+     //   Debug.Log($"[Judge] Slide {grade} at {t:F3}s");
         OnHit?.Invoke(_notes[best], grade);
         _consumedNotes.Add(best);
     }
+    #endregion
+
+    #region - 모든 노트판정이 끝난 뒤, GameEntry에 모든 판정이 끝났음을 전달 
+    private void CheckAllNotesJudged()
+    {
+        if (_notes == null) return;
+
+
+        //json에서 더이상 가져올 노트가 없을 경우 , 확인
+        if (_consumedNotes.Count >= _notes.Length)
+        {
+            Debug.Log("[Judge] All notes judged!");
+            OnAllNotesJudged?.Invoke();
+        }
+    }
+
     #endregion
 }
