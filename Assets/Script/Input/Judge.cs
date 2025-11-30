@@ -1,16 +1,17 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
-public enum HitGrade { Miss, Good, Great, Perfect} //총 4가지 판정으로 구분
+public enum HitGrade { Miss, Good, Great, Perfect }
 
 public class Judge : MonoBehaviour
 {
-    private int _nextIndex;  // 다음에 판정할 노트 인덱스
+    private int _nextIndex;
 
     [Header("Ref")]
     public Conductor conductor;
 
-    [Header("판정 시간의 구간의 폭 -> 절대값활용")]  //json에 지정해놓은 초와 플레이어가 클릭한 초의 간극을 계산후, 해당 변수와 비교하여 판정 
+    [Header("판정 시간의 구간의 폭 -> 절대값활용")]
     public int perfectsMs = 22;
     public int greatMs = 45;
     public int goodMs = 80;
@@ -19,25 +20,50 @@ public class Judge : MonoBehaviour
     public int longStartMs = 80;
     public int longEndMs = 80;
 
-    private NoteData[] _notes;  //현재 진행노트 데이터
-    private int _idx;  //현재 진행 포인터
+    private NoteData[] _notes;
+    private HashSet<int> _consumedNotes = new HashSet<int>(); // 소비된 노트 추적
+    private int _idx;
 
     private bool _holding;
     private NoteData _activeLong;
+    private int _activeLongIndex = -1;
 
-    public Action<NoteData, HitGrade> OnHit;  //성공 콜백
-    public Action<NoteData> OnMiss; // 미스 콜백
+    public Action<NoteData, HitGrade> OnHit;
+    public Action<NoteData> OnMiss;
 
+    // 새로운 곡 데이터를 로드할 때만 호출 (곡 선택 시)
     public void LoadChart(NoteData[] notes)
     {
-        _notes = notes;
+        if (notes == null)
+        {
+            Debug.LogError("[Judge] LoadChart: notes == null");
+            return;
+        }
+
+        // 시간순으로 정렬
+        _notes = new NoteData[notes.Length];
+        System.Array.Copy(notes, _notes, notes.Length);
+        System.Array.Sort(_notes, (a, b) => a.Timesec.CompareTo(b.Timesec));
+
+        Debug.Log($"[Judge] LoadChart: {_notes.Length} notes loaded and sorted by time");
+
+        // 첫 5개 노트 시간 확인 (디버깅용)
+        for (int i = 0; i < Mathf.Min(5, _notes.Length); i++)
+        {
+            Debug.Log($"  Note[{i}]: {_notes[i].Timesec:F3}s - {_notes[i].type}");
+        }
+    }
+
+    // PlayUI 활성화/게임 시작 시 호출 (같은 곡 재시작 포함)
+    public void ResetJudgment()
+    {
         _idx = 0;
         _holding = false;
+        _activeLong = default;
+        _activeLongIndex = -1;
+        _consumedNotes.Clear();
 
-        if (_notes == null)
-            Debug.LogError("[Judge] LoadChart: notes == null");
-        else
-            Debug.Log($"[Judge] LoadChart: {_notes.Length} notes loaded");
+        Debug.Log("[Judge] Judgment reset - ready to play");
     }
 
     float MsToSec(int ms) => ms * 0.001f;
@@ -45,23 +71,46 @@ public class Judge : MonoBehaviour
     HitGrade GradeFromDelta(float dt)
     {
         float adt = Mathf.Abs(dt);
-        if (adt<=MsToSec(perfectsMs)) return HitGrade.Perfect;
+        if (adt <= MsToSec(perfectsMs)) return HitGrade.Perfect;
         if (adt <= MsToSec(greatMs)) return HitGrade.Great;
-        if (adt<=MsToSec(goodMs)) return HitGrade.Good;
-        return HitGrade.Miss;  // 해당 범위에 없을경우, Miss 판정
-
+        if (adt <= MsToSec(goodMs)) return HitGrade.Good;
+        return HitGrade.Miss;
     }
 
     #region 진행 포인터 앞으로 밀기 (지나간 노트 정리)
     void CullPastNotes(float now)
     {
         if (_notes == null || _notes.Length == 0)
-            return; // 아직 차트 안 들어온 상태면 그냥 리턴
+            return;
 
-        while (_idx < _notes.Length && _notes[_idx].Timesec < now - MsToSec(goodMs))
+        while (_idx < _notes.Length)
         {
-            OnMiss?.Invoke(_notes[_idx]);
-            _idx++;
+            // 이미 소비된 노트는 스킵
+            if (_consumedNotes.Contains(_idx))
+            {
+                _idx++;
+                continue;
+            }
+
+            // 판정 가능 시간을 벗어난 노트만 Miss 처리
+            if (_notes[_idx].Timesec < now - MsToSec(goodMs))
+            {
+                // 롱노트가 활성화 중이면 스킵
+                if (_holding && _idx == _activeLongIndex)
+                {
+                    _idx++;
+                    continue;
+                }
+
+                Debug.Log($"[Judge] Miss - Note at {_notes[_idx].Timesec:F3}s, current: {now:F3}s");
+                OnMiss?.Invoke(_notes[_idx]);
+                _consumedNotes.Add(_idx);
+                _idx++;
+            }
+            else
+            {
+                break;
+            }
         }
     }
     #endregion
@@ -69,7 +118,7 @@ public class Judge : MonoBehaviour
     #region - 일반 노트 입력시 판정
     public void TapLeft(double inputDspTime)
     {
-        FeedTap(NoteType.NormalNote_L,inputDspTime);
+        FeedTap(NoteType.NormalNote_L, inputDspTime);
     }
 
     public void TapRight(double inputDspTime)
@@ -77,42 +126,71 @@ public class Judge : MonoBehaviour
         FeedTap(NoteType.NormalNote_R, inputDspTime);
     }
 
-    void FeedTap(NoteType type, double inputDspTime)  //일반노트 -> 마우스 좌, 우 단일 클릭
+    void FeedTap(NoteType type, double inputDspTime)
     {
         if (_notes == null || _notes.Length == 0 || conductor == null)
-            return; // 차트 없는데 입력 들어오면 무시
+            return;
 
         float t = (float)(inputDspTime - conductor.dspStart) + conductor.userOffsetms / 1000f;
-        float now = conductor.NowSec;
 
-        CullPastNotes(now);
+        // 디버그: 입력 시간 확인
+        Debug.Log($"[Judge] Tap {type} at t={t:F3}s (input={inputDspTime:F3}, dspStart={conductor.dspStart:F3})");
+
+        // ?? 수정: t를 기준으로 정리
+        CullPastNotes(t);
 
         int best = -1;
         float bestDiff = 999f;
+        float judgmentWindow = MsToSec(goodMs);
 
-        
-        for (int i = _idx; i < _notes.Length && i < _idx + 16; i++)
+        // ?? 수정: 범위 내 모든 노트 검색
+        for (int i = _idx; i < _notes.Length; i++)
         {
-            if (_notes[i].type != type) continue;
-            float d = Mathf.Abs(_notes[i].Timesec - t);
-            if (d < bestDiff) { bestDiff = d; best = i; }
+            // 이미 소비된 노트는 스킵
+            if (_consumedNotes.Contains(i))
+                continue;
 
-            if (_notes[i].Timesec > t + MsToSec(goodMs)) break;
+            // 타입이 다르면 스킵
+            if (_notes[i].type != type)
+                continue;
+
+            float diff = _notes[i].Timesec - t;
+            float absDiff = Mathf.Abs(diff);
+
+            // 판정 범위를 벗어난 미래 노트는 종료
+            if (diff > judgmentWindow)
+                break;
+
+            // 가장 가까운 노트 찾기
+            if (absDiff < bestDiff)
+            {
+                bestDiff = absDiff;
+                best = i;
+            }
         }
 
-        if (best < 0 || GradeFromDelta(_notes[best].Timesec - t) == HitGrade.Miss)
+        // 판정 처리
+        if (best < 0)
         {
+            Debug.Log($"[Judge] No note found for tap at {t:F3}s");
             OnMiss?.Invoke(new NoteData { type = type, Timesec = t });
             return;
         }
 
-        var g = GradeFromDelta(_notes[best].Timesec - t);
-        OnHit?.Invoke(_notes[best], g);
+        var grade = GradeFromDelta(_notes[best].Timesec - t);
+        float deltaMs = (_notes[best].Timesec - t) * 1000f;
 
-        // 소비 및 포인터 전진
-        if (best == _idx) _idx++;
-        // 이미 지난 것들도 정리
-        while (_idx < _notes.Length && _notes[_idx].Timesec < t - MsToSec(goodMs)) _idx++;
+        if (grade == HitGrade.Miss)
+        {
+            Debug.Log($"[Judge] Miss - Note[{best}] at {_notes[best].Timesec:F3}s, Delta: {deltaMs:F1}ms (threshold: {goodMs}ms)");
+            OnMiss?.Invoke(_notes[best]);
+            return;
+        }
+
+        // ?? 수정: 성공 판정 시 노트 소비
+        Debug.Log($"[Judge] {grade} - Note[{best}] at {_notes[best].Timesec:F3}s, Delta: {deltaMs:F1}ms");
+        OnHit?.Invoke(_notes[best], grade);
+        _consumedNotes.Add(best);
     }
     #endregion
 
@@ -120,7 +198,7 @@ public class Judge : MonoBehaviour
     public void LongNoteStart(double inputDsptime)
     {
         if (_notes == null || _notes.Length == 0 || conductor == null)
-            return; // 차트 없는데 입력 들어오면 무시
+            return;
 
         float t = (float)(inputDsptime - conductor.dspStart) + conductor.userOffsetms / 1000f;
         float w = MsToSec(longStartMs);
@@ -128,36 +206,42 @@ public class Judge : MonoBehaviour
         int best = -1;
         float bestDiff = 999f;
 
-        for (int i = _idx; i < _notes.Length && i < _idx + 24; i++)
+        for (int i = _idx; i < _notes.Length; i++)
         {
-            if (_notes[i].type != NoteType.LongNote) continue;
-            
-            float d = Mathf.Abs(_notes[i].Timesec - t);
+            if (_consumedNotes.Contains(i))
+                continue;
 
-            if (d < bestDiff) { 
-            bestDiff = d;
-            best = i; }
+            if (_notes[i].type != NoteType.LongNote)
+                continue;
 
-            if (_notes[i].Timesec > t + w) break;
+            float diff = _notes[i].Timesec - t;
+            float absDiff = Mathf.Abs(diff);
+
+            if (diff > w)
+                break;
+
+            if (absDiff < bestDiff)
+            {
+                bestDiff = absDiff;
+                best = i;
+            }
         }
 
-        if (best < 0 || Mathf.Abs(_notes[best].Timesec - t) > w)
+        if (best < 0 || bestDiff > w)
         {
-            OnMiss?.Invoke(new NoteData { type = NoteType.LongNote,Timesec = t});
+            Debug.Log($"[Judge] Long note start miss at {t:F3}s");
+            OnMiss?.Invoke(new NoteData { type = NoteType.LongNote, Timesec = t });
             return;
         }
 
         _activeLong = _notes[best];
+        _activeLongIndex = best;
         _holding = true;
 
-
-        OnHit?.Invoke(_activeLong, GradeFromDelta(_activeLong.Timesec -t));
-
-        if(best == _idx)
-        {
-            _idx++;
-        }
-
+        var grade = GradeFromDelta(_activeLong.Timesec - t);
+        Debug.Log($"[Judge] Long note start {grade} at {t:F3}s");
+        OnHit?.Invoke(_activeLong, grade);
+        _consumedNotes.Add(best);
     }
     #endregion
 
@@ -171,60 +255,77 @@ public class Judge : MonoBehaviour
         float endTime = _activeLong.Timesec + _activeLong.durationSec;
         float w = MsToSec(longEndMs);
 
-
         if (Mathf.Abs(endTime - t) <= w)
         {
-            OnHit?.Invoke(_activeLong, GradeFromDelta(endTime - t));
+            var grade = GradeFromDelta(endTime - t);
+            Debug.Log($"[Judge] Long note end {grade}, delta: {(endTime - t) * 1000:F1}ms");
+            OnHit?.Invoke(_activeLong, grade);
         }
         else
         {
+            Debug.Log($"[Judge] Long note end miss, delta: {(endTime - t) * 1000:F1}ms");
             OnMiss?.Invoke(_activeLong);
         }
 
         _holding = false;
+        _activeLongIndex = -1;
     }
     #endregion
 
-    #region 슬라이드 방향 : -1(left) , + 1(right)
+    #region 슬라이드
     public void FeedSlide(int dir, double inputDspTime)
     {
         if (_notes == null || _notes.Length == 0 || conductor == null)
-            return; // 차트 없는데 입력 들어오면 무시
+            return;
 
-        var targetType = (dir < 0 ) ? NoteType.SlideNote_L : NoteType.SlideNote_R;
+        var targetType = (dir < 0) ? NoteType.SlideNote_L : NoteType.SlideNote_R;
         float t = (float)(inputDspTime - conductor.dspStart) + conductor.userOffsetms / 1000f;
 
-        int best = -1; 
+        CullPastNotes(t);
+
+        int best = -1;
         float bestDiff = 999f;
+        float judgmentWindow = MsToSec(goodMs);
 
-        for (int i = _idx; i < _notes.Length && i < _idx + 16; i++)
+        for (int i = _idx; i < _notes.Length; i++)
         {
-            if (_notes[i].type != targetType) continue;
+            if (_consumedNotes.Contains(i))
+                continue;
 
-            float d = Mathf.Abs(_notes[i].Timesec - t);
-            if (d < bestDiff) 
-            { bestDiff = d; 
-                best = i; 
+            if (_notes[i].type != targetType)
+                continue;
+
+            float diff = _notes[i].Timesec - t;
+            float absDiff = Mathf.Abs(diff);
+
+            if (diff > judgmentWindow)
+                break;
+
+            if (absDiff < bestDiff)
+            {
+                bestDiff = absDiff;
+                best = i;
             }
-            if (_notes[i].Timesec > t + MsToSec(goodMs)) break;
         }
 
-        if (best < 0 || GradeFromDelta(_notes[best].Timesec - t) == HitGrade.Miss)
+        if (best < 0)
         {
+            Debug.Log($"[Judge] Slide miss - no note found at {t:F3}s");
             OnMiss?.Invoke(new NoteData { type = targetType, Timesec = t });
             return;
         }
 
-        var g = GradeFromDelta(_notes[best].Timesec - t);
-        OnHit?.Invoke(_notes[best], g);
+        var grade = GradeFromDelta(_notes[best].Timesec - t);
 
-        if (best == _idx) 
-            _idx++;
+        if (grade == HitGrade.Miss)
+        {
+            OnMiss?.Invoke(_notes[best]);
+            return;
+        }
 
+        Debug.Log($"[Judge] Slide {grade} at {t:F3}s");
+        OnHit?.Invoke(_notes[best], grade);
+        _consumedNotes.Add(best);
     }
     #endregion
 }
-
-
-
-
