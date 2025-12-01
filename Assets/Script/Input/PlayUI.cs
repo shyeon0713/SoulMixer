@@ -71,6 +71,7 @@ public class PlayUI : MonoBehaviour
                 Addscore(perfectGain); // 게이지 점수 추가
 
                 combo++; // 점수 추가
+                UpdateMaxCombo();
                 scoreText.text = combo.ToString(); // 점수 텍스트 출력
 
                 comboText.text = "Perfect!";  // Good 텍스트 출력
@@ -82,6 +83,7 @@ public class PlayUI : MonoBehaviour
                 Addscore(greatGain); // 게이지 점수 추가
 
                 combo++; // 점수 추가
+                UpdateMaxCombo();
                 scoreText.text = combo.ToString(); // 점수 텍스트 출력
 
                 comboText.text = "Great!";  // Good 텍스트 출력
@@ -93,6 +95,7 @@ public class PlayUI : MonoBehaviour
                 Addscore(goodGain); // 게이지 점수 추가
 
                 combo++; // 점수 추가
+                UpdateMaxCombo();
                 scoreText.text = combo.ToString(); // 점수 텍스트 출력
 
                 comboText.text = "Good!";  // Good 텍스트 출력
@@ -157,6 +160,31 @@ public class PlayUI : MonoBehaviour
 
         scoreSlider.value = sildervalue;
     }
+    #endregion
 
+
+
+    #region - 외부에서 최종데이터를 가져가지 위한 함수
+    public float GetFinalGauge()
+    {
+        return sildervalue;
+    }
+
+    public int GetMaxCombo()
+    {
+        return maxCombo;
+    }
+    #endregion
+
+
+
+    #region - 결과값에 사용되는 최대 콤보저장
+    private void UpdateMaxCombo()
+    {
+        if (combo > maxCombo)
+        {
+            maxCombo = combo;
+        }
+    }
     #endregion
 }

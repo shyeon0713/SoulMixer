@@ -565,39 +565,20 @@
       "type": "NormalNote_L",
       "timeSec": 66.001
     },
+ 
     {
       "id": 112,
-      "type": "NormalNote_R",
-      "timeSec": 66.001
-    },
-    {
-      "id": 113,
-      "type": "NormalNote_L",
-      "timeSec": 66.819
-    },
-    {
-      "id": 114,
-      "type": "NormalNote_R",
-      "timeSec": 66.819
-    },
-    {
-      "id": 115,
-      "type": "NormalNote_R",
-      "timeSec": 67.639
-    },
-    {
-      "id": 116,
       "type": "LongNote",
       "timeSec": 70.901,
       "durationSec":3.262
     },
     {
-      "id": 117,
+      "id": 113,
       "type": "SlideR",
       "timeSec": 71.719
     },
     {
-      "id": 118,
+      "id": 114,
       "type": "SlideL",
       "timeSec": 72.541
     }

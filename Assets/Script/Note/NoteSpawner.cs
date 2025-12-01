@@ -51,7 +51,7 @@ public class NoteSpawner : MonoBehaviour
 
         WarmupPools();
 
-        Debug.Log($"[NoteSpawner] LoadChart: {_notes?.Length ?? 0} notes loaded");
+      //  Debug.Log($"[NoteSpawner] LoadChart: {_notes?.Length ?? 0} notes loaded");
     }
 
     // 스폰 상태 리셋 (곡 재시작 시)
