@@ -14,17 +14,24 @@ public class AnimationManager : MonoBehaviour
     public List<AnimData> animationList; // 애니메이션 리스트
 
     // 빠른 검색을 위한 딕셔너리
-    private Dictionary<string, GameObject> animDictionary = new Dictionary<string, GameObject>();
+    private Dictionary<string, GameObject> animDict = new Dictionary<string, GameObject>();
 
+    //애니메이션 재활용을위한 리스트
+    private Dictionary<string, List<GameObject>> poolDict = new Dictionary<string, List<GameObject>>();
+   
     private void Awake()
     {
         if (instance == null) instance = this;  // 싱글톤 설정
-        else Destroy(gameObject);
 
-        // 리스트를 딕셔너리로 변환 (초기화)
         foreach (var item in animationList)
         {
-            animDictionary.Add(item.name, item.prefab);
+            // 1. 프리팹 등록
+            if (!animDict.ContainsKey(item.name))
+                animDict.Add(item.name, item.prefab);
+
+            // 2. 창고 공간 마련
+            if (!poolDict.ContainsKey(item.name))
+                poolDict.Add(item.name, new List<GameObject>());
         }
 
     }
@@ -32,14 +39,31 @@ public class AnimationManager : MonoBehaviour
     #region- 외부에서 호출하는 함수
     public void PlayAnimation(string name, Vector3 position)
     {
-        if (animDictionary.ContainsKey(name))
+        if (!animDict.ContainsKey(name)) return;
+
+        GameObject selectObj = null;
+        List<GameObject> currentPool = poolDict[name];
+
+        foreach (var obj in currentPool)
         {
-            Instantiate(animDictionary[name], position, Quaternion.identity);
+            if (!obj.activeSelf) 
+            {
+                selectObj = obj;
+                break;
+            }
         }
-        else
+
+        if (selectObj == null)
         {
-            Debug.LogWarning($"애니메이션 {name}을 찾을 수 없습니다.");
+            selectObj = Instantiate(animDict[name]);
+            // 부모를 매니저로 설정해서 Hierarchy창 정리 (선택사항)
+            selectObj.transform.SetParent(transform);
+            // 창고 명단에 등록
+            currentPool.Add(selectObj);
         }
+
+        selectObj.transform.position = position;
+        selectObj.SetActive(true); 
     }
     #endregion
     //AnimationManager.Instance.PlayAnimation("LevelUpEffect", transform.position); 로 호출

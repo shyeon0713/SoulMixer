@@ -21,6 +21,7 @@ public class GameEntry : MonoBehaviour
 
     private Coroutine _resultRoutine; // 5초뒤에 결과창 UI로 이동하기 위해 코루틴 생성
 
+
     // 테스트용: 씬 켜지면 자동 재생
     void Start()
     {
@@ -33,7 +34,7 @@ public class GameEntry : MonoBehaviour
     {
         if (selectedSongEntry == null)
         {
-            Debug.LogError("[GameEntry] selectedSongEntry가 비었습니다.");
+            
             return;
         }
 
@@ -41,20 +42,21 @@ public class GameEntry : MonoBehaviour
         if (!audioSource) audioSource = GetComponent<AudioSource>();
 
 
-
         // 1) 오디오 연결
         audioSource.clip = selectedSongEntry.audioClip;
-        Debug.Log($"[GameEntry] AudioClip = {audioSource.clip?.name}");
-
-
+       
 
         // 2) 차트 파싱 → NoteData[]
         var notes = ChartLoader.LoadFromSongEntry(selectedSongEntry, selectedDifficulty);
         if (notes.Length == 0)
         {
-            Debug.LogError("[GameEntry] LoadFromSongEntry 결과가 비었습니다.");
+           
             return;
         }
+
+        //애니메이션 연결 -> 애니메이션을 실행할 위치설정 및 호출
+        //  judge.SetAnimation(animpos);
+        // 애니메이션이 너무 빨라서 마우스 입력부분에 넣을 예정
 
         //판정/ 스폰 세팅
         judge.LoadChart(notes);

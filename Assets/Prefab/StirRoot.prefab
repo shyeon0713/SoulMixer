@@ -96,6 +96,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4685260672575300824}
   - component: {fileID: 82158822855198236}
+  - component: {fileID: 3152318004430040862}
   m_Layer: 0
   m_Name: StirRoot
   m_TagString: Untagged
@@ -142,6 +143,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3152318004430040862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3150231122097034821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4e568d2bd29fe34c9a3178be6d427ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lifeTime: 3
 --- !u!1 &5643019676694189675
 GameObject:
   m_ObjectHideFlags: 0

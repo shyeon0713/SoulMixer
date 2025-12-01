@@ -22,4 +22,6 @@ public class NoteData
     [Tooltip("Long 노트일 때만 사용 (초)")]
     public float durationSec = 5f;
 
+    public string animName; // 애니메이션 이름
+
 }

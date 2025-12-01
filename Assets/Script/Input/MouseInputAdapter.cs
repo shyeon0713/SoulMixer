@@ -6,13 +6,17 @@ public class MouseInputAdapter : MonoBehaviour
     public Conductor conductor;
 
     [Header("Slide detect")]
-    public float slideThresholdPs = 120f;
-    public float slideWindowSec = 0.25f;
+    public float slideThresholdPs = 10f;
+    public float slideWindowSec = 0.5f;
     public float slideCooldownSec = 0.20f;
 
     private float _accumX;
     private double _windowStartDsp;
     private double _lastSlideDsp;
+
+
+    [Header("애니메이션 위치")]
+    public Transform animpos;
 
     void OnEnable()
     {
@@ -25,12 +29,31 @@ public class MouseInputAdapter : MonoBehaviour
     {
         var dsp = AudioSettings.dspTime;
 
-        // 탭 입력
-        if (Input.GetMouseButtonDown(0)) judge.TapLeft(dsp);
-        if (Input.GetMouseButtonDown(1)) judge.TapRight(dsp);
+        //입력 확인
+        if (Input.GetMouseButtonDown(2)) Debug.Log(" 휠 버튼 눌림!");
+        float testDx = Input.GetAxis("Mouse X");
+        if (testDx != 0) Debug.Log($"↔? 마우스 이동중: {testDx}");
+        //
 
-        // 롱노트
-        if (Input.GetMouseButtonDown(2)) judge.LongNoteStart(dsp);
+        // 탭 입력
+        if (Input.GetMouseButtonDown(0))
+        {
+            judge.TapLeft(dsp);
+            PlayAnim("Shake");
+        }
+        if (Input.GetMouseButtonDown(1))
+        {
+            judge.TapRight(dsp);
+            PlayAnim("Shake");
+        }
+
+        // 롱노트 -> 휠버튼 누르는거 유지
+        if (Input.GetMouseButtonDown(2))
+        {
+            judge.LongNoteStart(dsp);
+            PlayAnim("Stir");  // 롱노트 애니메이션
+        }
+        
         if (Input.GetMouseButtonUp(2)) judge.LongNoteEnd(dsp);
 
         // 슬라이드(좌/우) 감지 
@@ -48,10 +71,23 @@ public class MouseInputAdapter : MonoBehaviour
             {
                 int dir = _accumX > 0 ? +1 : -1;
                 judge.FeedSlide(dir, dsp);
+
+                PlayAnim("Pour");
+
                 _accumX = 0f;
                 _lastSlideDsp = dsp;
                 _windowStartDsp = dsp;
             }
+        }
+    }
+
+
+    void PlayAnim(string name)
+    {
+        // 위치(Glass)가 연결되어 있고, 매니저가 존재할 때만 실행
+        if (animpos != null && AnimationManager.instance != null)
+        {
+            AnimationManager.instance.PlayAnimation(name, animpos.position);
         }
     }
 }

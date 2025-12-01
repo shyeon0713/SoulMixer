@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 public enum HitGrade { Miss, Good, Great, Perfect }
 
@@ -34,27 +35,19 @@ public class Judge : MonoBehaviour
 
     public Action OnAllNotesJudged;   // 모든 노트 판정 끝났을 때 호출
 
+
+    private Transform aniP; // 애니메이션이 나올 위치
+
+
     // 새로운 곡 데이터를 로드할 때만 호출 (곡 선택 시)
     public void LoadChart(NoteData[] notes)
     {
-        if (notes == null)
-        {
-       //     Debug.LogError("[Judge] LoadChart: notes == null");
-            return;
-        }
 
         // 시간순으로 정렬
         _notes = new NoteData[notes.Length];
         System.Array.Copy(notes, _notes, notes.Length);
         System.Array.Sort(_notes, (a, b) => a.Timesec.CompareTo(b.Timesec));
 
-     //   Debug.Log($"[Judge] LoadChart: {_notes.Length} notes loaded and sorted by time");
-
-        // 첫 5개 노트 시간 확인 (디버깅용)
-        for (int i = 0; i < Mathf.Min(5, _notes.Length); i++)
-        {
-            Debug.Log($"  Note[{i}]: {_notes[i].Timesec:F3}s - {_notes[i].type}");
-        }
     }
 
     // PlayUI 활성화/게임 시작 시 호출 (같은 곡 재시작 포함)
@@ -66,7 +59,6 @@ public class Judge : MonoBehaviour
         _activeLongIndex = -1;
         _consumedNotes.Clear();
 
-      //  Debug.Log("[Judge] Judgment reset - ready to play");
     }
 
     float MsToSec(int ms) => ms * 0.001f;
@@ -105,7 +97,6 @@ public class Judge : MonoBehaviour
                     continue;
                 }
 
-            //    Debug.Log($"[Judge] Miss - Note at {_notes[_idx].Timesec:F3}s, current: {now:F3}s");
                 OnMiss?.Invoke(_notes[_idx]);
                 _consumedNotes.Add(_idx);
                 _idx++;
@@ -136,17 +127,15 @@ public class Judge : MonoBehaviour
 
         float t = (float)(inputDspTime - conductor.dspStart) + conductor.userOffsetms / 1000f;
 
-        // 디버그: 입력 시간 확인
-      //  Debug.Log($"[Judge] Tap {type} at t={t:F3}s (input={inputDspTime:F3}, dspStart={conductor.dspStart:F3})");
 
-        // ?? 수정: t를 기준으로 정리
+        // 수정: t를 기준으로 정리
         CullPastNotes(t);
 
         int best = -1;
         float bestDiff = 999f;
         float judgmentWindow = MsToSec(goodMs);
 
-        // ?? 수정: 범위 내 모든 노트 검색
+        // 수정: 범위 내 모든 노트 검색
         for (int i = _idx; i < _notes.Length; i++)
         {
             // 이미 소비된 노트는 스킵
@@ -175,7 +164,6 @@ public class Judge : MonoBehaviour
         // 판정 처리
         if (best < 0)
         {
-          //  Debug.Log($"[Judge] No note found for tap at {t:F3}s");
             OnMiss?.Invoke(new NoteData { type = type, Timesec = t });
             return;
         }
@@ -185,15 +173,18 @@ public class Judge : MonoBehaviour
 
         if (grade == HitGrade.Miss)
         {
-          //  Debug.Log($"[Judge] Miss - Note[{best}] at {_notes[best].Timesec:F3}s, Delta: {deltaMs:F1}ms (threshold: {goodMs}ms)");
             OnMiss?.Invoke(_notes[best]);
             return;
         }
 
         //  수정: 성공 판정 시 노트 소비
-       // Debug.Log($"[Judge] {grade} - Note[{best}] at {_notes[best].Timesec:F3}s, Delta: {deltaMs:F1}ms");
         OnHit?.Invoke(_notes[best], grade);
+
+        //PlayNoteAnimation(_notes[best]);   //애니메이션 출력
+        // 애니메이션이 너무 빨라서 마우스 입력부분에 넣을 예정
         _consumedNotes.Add(best);
+
+        CheckAllNotesJudged();
     }
     #endregion
 
@@ -232,7 +223,6 @@ public class Judge : MonoBehaviour
 
         if (best < 0 || bestDiff > w)
         {
-       //    Debug.Log($"[Judge] Long note start miss at {t:F3}s");
             OnMiss?.Invoke(new NoteData { type = NoteType.LongNote, Timesec = t });
             return;
         }
@@ -242,8 +232,11 @@ public class Judge : MonoBehaviour
         _holding = true;
 
         var grade = GradeFromDelta(_activeLong.Timesec - t);
-      //  Debug.Log($"[Judge] Long note start {grade} at {t:F3}s");
+
         OnHit?.Invoke(_activeLong, grade);
+
+        //PlayNoteAnimation(_activeLong);  // 롱노트 애니메이션 출력
+        // 애니메이션이 너무 빨라서 마우스 입력부분에 넣을 예정
         _consumedNotes.Add(best);
     }
     #endregion
@@ -261,12 +254,12 @@ public class Judge : MonoBehaviour
         if (Mathf.Abs(endTime - t) <= w)
         {
             var grade = GradeFromDelta(endTime - t);
-         //   Debug.Log($"[Judge] Long note end {grade}, delta: {(endTime - t) * 1000:F1}ms");
+
             OnHit?.Invoke(_activeLong, grade);
         }
         else
         {
-        //    Debug.Log($"[Judge] Long note end miss, delta: {(endTime - t) * 1000:F1}ms");
+
             OnMiss?.Invoke(_activeLong);
         }
 
@@ -313,7 +306,7 @@ public class Judge : MonoBehaviour
 
         if (best < 0)
         {
-         //   Debug.Log($"[Judge] Slide miss - no note found at {t:F3}s");
+
             OnMiss?.Invoke(new NoteData { type = targetType, Timesec = t });
             return;
         }
@@ -326,9 +319,13 @@ public class Judge : MonoBehaviour
             return;
         }
 
-     //   Debug.Log($"[Judge] Slide {grade} at {t:F3}s");
+
         OnHit?.Invoke(_notes[best], grade);
+
+       // PlayNoteAnimation(_notes[best]);  // 슬라이드노트 애니메이션 출력
+       // 애니메이션이 너무 빨라서 마우스 입력부분에 넣을 예정
         _consumedNotes.Add(best);
+        CheckAllNotesJudged();
     }
     #endregion
 
@@ -347,4 +344,44 @@ public class Judge : MonoBehaviour
     }
 
     #endregion
+
+    #region -GameEntry에서 호출해줄 설정 함수
+    public void SetAnimation(Transform target)
+    {
+        this.aniP = target;
+    }
+
+    #endregion
+
+    #region - 지정된 애니메이션 출력 
+    private void PlayNoteAnimation(NoteData note)
+    {
+        if (aniP == null) return; // 애니메이션이 작동할 위치가 설정 되어 있지않을 경우 중단
+
+        string targetAnimName = "";
+
+        switch (note.type)  // 노트 타입에 따라 이름 배정
+        {
+            case NoteType.NormalNote_L:
+            case NoteType.NormalNote_R:
+                targetAnimName = "Shake";
+                break;
+
+            case NoteType.SlideNote_L:
+            case NoteType.SlideNote_R:
+                targetAnimName = "Pour"; // 변수에 "Shake"라는 글자를 담음
+                break;
+
+            case NoteType.LongNote:
+                targetAnimName = "Stir";
+                break;
+        }
+
+        if (!string.IsNullOrEmpty(targetAnimName))
+        {
+            // 여기서 targetAnimName 변수를 사용하고 끝!
+            AnimationManager.instance.PlayAnimation(targetAnimName, aniP.position);
+        }
+        #endregion
+    }
 }
