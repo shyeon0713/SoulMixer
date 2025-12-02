@@ -159,7 +159,7 @@ public class NoteSpawner : MonoBehaviour
         var img = view.GetComponentInChildren<Image>();
         if (img != null && spriteSet != null)
         {
-            var sp = spriteSet.GetSprite(n.key); // 또는 key 기준으로 바꿀 수도 있음
+            var sp = spriteSet.GetSpriteByKeyString(n.key); // 수정 - 노트가 아닌 NoteData.key기반으로 스프라이트를 가져와야하므로 수정
             if (sp != null)
                 img.sprite = sp;
         }

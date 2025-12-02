@@ -4,6 +4,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+[System.Serializable]
+public class SpeakerSpriteSet
+{
+    public string speakerName;
+    public List<Sprite> sprites;
+    public List<string> spriteNames;   // sprites 와 동일한 순서
+}
+
 public class DialogueUI : MonoBehaviour
 {
 
@@ -11,99 +19,149 @@ public class DialogueUI : MonoBehaviour
     public Button nextscript;
 
     public DialogueLoader dialogueLoader;   // 대사 가져오기
+
+    [Header("Text UI 부분")]
     public TMP_Text npcnametext;
     public TMP_Text dialogueText;
 
-    public Image npc1Image;
-    public Image npc2Image;
+    [Header("NPC 이미지 -> 하나의 Dictionary로 관리")]
+    public List<Image> npcImages;
+    public List<string> npcNames;
 
-    public List<Sprite> npc1SpriteList;
-    public List<Sprite> npc2SpriteList;
-    public List<string> npc1SpriteNames;
-    public List<string> npc2SpriteNames;
-    // sprite는 happy, angry, normal 로 구성
-    //Json에서 //주석을 지원하기 않아서 이곳에 작성
-    float gray = 111f / 225f;
+    public List<SpeakerSpriteSet> spriteSets; // 각 NPC별 스프라이트 묶음 리스트
 
-    private Dictionary<string, Sprite> npc1SpriteDict = new();
-    private Dictionary<string, Sprite> npc2SpriteDict = new();
+
+    public RectTransform leftSlot;
+    public RectTransform rightSlot;
+
+    private Dictionary<string, Image> imageBank = new();
+    private Dictionary<string, Dictionary<string, Sprite>> spriteBank = new();
+
+    private float gray = 111f / 225f;
+    private float typingDelay = 0.05f;
 
     private int currentLine = 0;
+    private Coroutine typingCoroutine; // 타이핑 효과를 담당하는 코루틴
 
     void Start()
     {
 
-        dialogueLoader.LoadDialogue("JSON/conversation");
-        nextscript.onClick.AddListener(OutputScript);  // 버튼 연결
+        dialogueLoader.LoadScenario("conversation");
+        nextscript.onClick.AddListener(NextLine); // 버튼 리스너 연결
 
-        for (int i = 0; i < npc1SpriteList.Count; i++)
-        {
-            npc1SpriteDict[npc1SpriteNames[i]] = npc1SpriteList[i];
-        }
-        for (int i = 0; i < npc2SpriteList.Count; i++)
-        {
-            npc2SpriteDict[npc2SpriteNames[i]] = npc2SpriteList[i];
-        }
+        BuildImageBank();
+        BuildSpriteBank();
 
-
-        if (dialogueLoader.dialoguedata != null &&
-        dialogueLoader.dialoguedata.dialogues != null &&
-        dialogueLoader.dialoguedata.dialogues.Count > 0)    //대사가 없을 경우를 생각못함..
-        {
+        if (dialogueLoader.dialoguedata.dialogues.Count > 0)
             OutputDialogue(currentLine);
-        }
 
 
     }
 
-    void OutputScript()  // 다음 버튼 누르면 다음 대사 출력
+    private void BuildImageBank()
     {
-        currentLine++;
+        for (int i = 0; i < npcImages.Count; i++)
+            imageBank[npcNames[i]] = npcImages[i];
+    }
 
-        if (currentLine < dialogueLoader.dialoguedata.dialogues.Count)
+    private void BuildSpriteBank()
+    {
+        foreach (var set in spriteSets)
         {
-            OutputDialogue(currentLine);
+            var dict = new Dictionary<string, Sprite>();
+
+            for (int i = 0; i < set.spriteNames.Count; i++)
+                dict[set.spriteNames[i]] = set.sprites[i];
+
+            spriteBank[set.speakerName] = dict;
+        }
+    }
+
+    void NextLine()  // 버튼 리스너
+    {
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+            dialogueText.text = dialogueLoader.dialoguedata.dialogues[currentLine].text;
+            typingCoroutine = null;
+            return;
         }
 
+        currentLine++;
+
+        if (currentLine >= dialogueLoader.dialoguedata.dialogues.Count)
+        {
+            nextscript.interactable = false;
+            return;
+        }
+
+        OutputDialogue(currentLine);
     }
 
     void OutputDialogue(int index)
     {
-        var line = dialogueLoader.dialoguedata.dialogues[index];  // var: 컴파일러가 변수의 타입을 자동으로 추론하게 해주는 키워드
+        var line = dialogueLoader.dialoguedata.dialogues[index];
+
         npcnametext.text = line.speaker;
-        dialogueText.text = line.text;
+        ResetAllImagesToWhite();
 
-        // npc1Image.gameObject.SetActive(false);   //이미지 비활성활 -> 시작할 때
-        //npc2Image.gameObject.SetActive(false);     //이미지 비활성활 -> 시작할 때
-        npc1Image.color = new Color(1f, 1f, 1f, 1f);
-        npc2Image.color = new Color(1f, 1f, 1f, 1f);
+        ApplyPosition(line.speaker, line.position);
 
-        if (line.speaker == "NPC1")
+        foreach (var name in imageBank.Keys)
         {
-            // npc1Image.gameObject.SetActive(true);  
-            npc2Image.color = new Color(gray, gray, gray, 1f);  //이미지2는 회색
-            npc1Image.sprite = GetSpriteFromDict(npc1SpriteDict, line.sprite);
+            if (name != line.speaker)
+                imageBank[name].color = new Color(gray, gray, gray, 1f);
         }
-        else if (line.speaker == "NPC2")
-        {
-            // npc2Image.gameObject.SetActive(true);
-            npc1Image.color = new Color(gray, gray, gray, 1f);  //이미지1은 회색
-            npc2Image.sprite = GetSpriteFromDict(npc2SpriteDict, line.sprite);
-        }
-    }
 
-
-    Sprite GetSpriteFromDict(Dictionary<string, Sprite> dict, string key)    // Dictionary로 교체
-    {
-        if (dict.TryGetValue(key, out Sprite sprite))
+        if (spriteBank.ContainsKey(line.speaker) &&
+            spriteBank[line.speaker].ContainsKey(line.sprite))
         {
-            return sprite;
+            imageBank[line.speaker].sprite =
+                spriteBank[line.speaker][line.sprite];
         }
         else
         {
-            Debug.LogWarning($"스프라이트 키 '{key}'를 찾을 수 없습니다.");
-            return null;
+            Debug.LogWarning($"스프라이트 '{line.sprite}'를 speaker '{line.speaker}'에서 찾을 수 없습니다.");
         }
 
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
+
+        typingCoroutine = StartCoroutine(TypeText(line.text));
     }
+
+    void ResetAllImagesToWhite()
+    {
+        foreach (var img in imageBank.Values)
+            img.color = Color.white;
+    }
+
+    IEnumerator TypeText(string text)
+    {
+        dialogueText.text = "";
+
+        foreach (char c in text)
+        {
+            dialogueText.text += c;
+           // SoundSetting.Instance.PlaySfx(6);
+            yield return new WaitForSeconds(typingDelay);
+        }
+
+        typingCoroutine = null;
+    }
+
+
+    #region - 스프라이트 위치결정 -> 앵커 이동?
+    void ApplyPosition(string speaker, string pos)
+    {
+        if (!imageBank.ContainsKey(speaker))
+            return;
+
+        Vector2 targetPos = pos == "right"
+            ? rightSlot.anchoredPosition
+            : leftSlot.anchoredPosition;
+
+        imageBank[speaker].rectTransform.anchoredPosition = targetPos;
+    }
+    #endregion
 }

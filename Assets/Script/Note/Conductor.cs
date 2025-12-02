@@ -10,7 +10,9 @@ public class NoteJson
     public int id;
     public string type;  // 노트 타입 명시
     public float timeSec; //판정 시간
-    public float durationSec; //롱노트만 
+
+    public string key;
+   
 }
 
 
