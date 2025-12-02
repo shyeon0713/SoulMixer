@@ -3,39 +3,48 @@ using UnityEngine;
 public class UINoteView : MonoBehaviour
 {
     public RectTransform rect;   // 자기 자신의 RectTransform
+    public Conductor conductor;
 
-    public void Init(RectTransform board, Vector2 startLocalPos, Vector2 targetLocalPos)
+    private Vector2 _start;
+    private Vector2 _target;
+    private float _startSec;
+    private float _hitSec;
+
+    private void Awake()
     {
-        rect.SetParent(board, worldPositionStays: false);
+        if (rect == null)
+            rect = GetComponent<RectTransform>();
+    }
+
+    #region -  UI 노트 초기화, 스폰 시점에 한 번만 호출
+    public void Init(RectTransform parent, Vector2 startLocalPos, Vector2 targetLocalPos,
+                     Conductor c, float hitSec)
+    {
+        if (rect == null)
+            rect = GetComponent<RectTransform>();
+
+        rect.SetParent(parent, false);
         rect.anchoredPosition = startLocalPos;
+
         _start = startLocalPos;
         _target = targetLocalPos;
-    }
 
-    Vector2 _start, _target;
-    float _startSec, _hitSec;
-    public Conductor conductor;
-    public float appearLeadSec = 1f;
-
-    public void SetTiming(float hitSec)
-    {
+        conductor = c;
         _hitSec = hitSec;
-        _startSec = hitSec - appearLeadSec;
+        _startSec = c.NowSec;   // 지금 시점부터 hitSec까지 이동
     }
-
-    void Update()
+    #endregion
+    private void Update()
     {
+        if (conductor == null) return;
+
         float now = conductor.NowSec;
 
-        if (now <= _startSec)
-        {
-            rect.anchoredPosition = _start;
-            return;
-        }
-
+        // 진행 비율 계산 (0~1)
         float t = Mathf.InverseLerp(_startSec, _hitSec, now);
         t = Mathf.Clamp01(t);
 
         rect.anchoredPosition = Vector2.Lerp(_start, _target, t);
     }
 }
+

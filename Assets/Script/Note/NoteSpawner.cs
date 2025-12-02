@@ -1,57 +1,49 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 public class NoteSpawner : MonoBehaviour
 {
     [Header("Refs")]
     public Conductor conductor;
     public NoteSprite spriteSet;
-    public RectTransform noteLayer;
+    public FieldGrid grid;
+    public RectTransform noteLayer;   //그리드 보드와 같은 오브젝트
 
     [Header("Prefabs (UGUI)")]
-    public RectTransform singleNotePrefab;
+    public UINoteView notePrefab;
 
 
-    [Header("Scroll")]
-    public float spawnLeadTimeSec = 2.0f;
-    public float despawnLagSec = 1.0f;
+    [Header("Time")]
+    public float spawnLeadTimeSec = 1.0f;  // 판정  몇 초 전에 스폰할지
+    public float despawnLagSec = 1.0f;  // 판정 후 몇 초 뒤에 회수할지
 
     [Header("Pooling")]
-    public int initialSinglePool = 64;
-    public int initialLongPool = 16;
+    public int initialPoolSize = 64;
 
     private NoteData[] _notes;
     private int _nextSpawn;
 
     private readonly List<ActiveItem> _active = new();
-    private readonly Stack<RectTransform> _singlePool = new();
-    private readonly Stack<LongNoteView> _longPool = new();
-
-    [Header("노트 위치 설정")]
-    public float judgeLineX = 725f;  // 판정선 위치 
-    public float spawnStartX = -734f;  // 노트 생성 위치 
-    public float noteY = 382f;  // 노트 Y 위치
-    public float scrollSpeedPx = 400f;  // 왼쪽에서 오른쪽 이동
+    private readonly Stack<UINoteView> _pool = new();
 
     struct ActiveItem
     {
         public NoteData data;
-        public RectTransform rect;
-        public LongNoteView longView;
-        public bool isLong;
-        public float spawnTime;  // 노트가 생성된 시간
+        public UINoteView view;
+
     }
 
-    #region Json파일 로드
+    #region Json파일 로드 / 리셋
     public void LoadChart(NoteData[] notes)
     {
         _notes = notes;
         _nextSpawn = 0;
 
-        WarmupPools();
+        WarmupPool();
 
-      //  Debug.Log($"[NoteSpawner] LoadChart: {_notes?.Length ?? 0} notes loaded");
+        //  Debug.Log($"[NoteSpawner] LoadChart: {_notes?.Length ?? 0} notes loaded");
     }
 
     // 스폰 상태 리셋 (곡 재시작 시)
@@ -59,203 +51,129 @@ public class NoteSpawner : MonoBehaviour
     {
         _nextSpawn = 0;
 
-        // 활성 노트 모두 회수
         for (int i = _active.Count - 1; i >= 0; i--)
         {
-            var item = _active[i];
-            if (item.isLong)
-                RecycleLong(item.longView);
-            else
-                RecycleSingle(item.rect);
+            Recycle(_active[i].view);
         }
         _active.Clear();
 
         Debug.Log("[NoteSpawner] Spawner reset");
     }
+
     #endregion
 
+ 
+
     #region - 풀링 
-    void WarmupPools()
+    void WarmupPool()
     {
-        if (singleNotePrefab == null || noteLayer == null)
+        if (notePrefab == null || noteLayer == null)
         {
-            Debug.LogWarning("[NoteSpawner] WarmupPools: prefab 또는 noteLayer가 비어 있음");
+            Debug.LogWarning("[NoteSpawner] WarmupPool: prefab 또는 noteLayer가 비어 있음");
             return;
         }
 
-        // 싱글 노트
-        for (int i = _singlePool.Count; i < initialSinglePool; i++)
+        for (int i = _pool.Count; i < initialPoolSize; i++)
         {
-            var inst = Instantiate(singleNotePrefab, noteLayer);
+            var inst = Instantiate(notePrefab, noteLayer);
             inst.gameObject.SetActive(false);
-            _singlePool.Push(inst);
+            _pool.Push(inst);
         }
+    }
 
-        // 롱 노트
-        if (longNotePrefab != null)
-        {
-            for (int i = _longPool.Count; i < initialLongPool; i++)
-            {
-                var inst = Instantiate(longNotePrefab, noteLayer);
-                inst.gameObject.SetActive(false);
-                _longPool.Push(inst);
-            }
-        }
+    UINoteView GetNote()
+    {
+        if (_pool.Count > 0)
+            return _pool.Pop();
+
+        return Instantiate(notePrefab, noteLayer);
+    }
+
+    void Recycle(UINoteView view)
+    {
+        if (view == null) return;
+        view.gameObject.SetActive(false);
+        view.transform.SetParent(noteLayer, false);
+        _pool.Push(view);
     }
     #endregion
 
+
+
     void Update()
     {
-        if (_notes == null || conductor == null || noteLayer == null)
+        if (_notes == null || conductor == null || noteLayer == null || grid == null)
             return;
 
         float now = conductor.NowSec;
 
-        // 판정 시간까지 남은 시간이 spawnLeadTimeSec 이하
+        // 스폰 조건: 판정 시간까지 남은 시간이 spawnLeadTimeSec 이하
         while (_nextSpawn < _notes.Length)
         {
             float timeUntilHit = _notes[_nextSpawn].Timesec - now;
 
             if (timeUntilHit <= spawnLeadTimeSec)
             {
-
                 SpawnOne(_notes[_nextSpawn]);
                 _nextSpawn++;
             }
             else
             {
-                break; // 아직 스폰할 시간이 아님
+                break;
             }
         }
 
-        // 노트 업데이트
+        // Despawn: 판정 시간 + 여유 시간 지났으면 회수
         for (int i = _active.Count - 1; i >= 0; i--)
         {
             var item = _active[i];
 
-            if (item.isLong)
+            if (now > item.data.Timesec + despawnLagSec)
             {
-                item.longView.UpdateVisual(now);
-
-                float endTime = item.data.Timesec + item.data.durationSec;
-                if (now > endTime + despawnLagSec)
-                {
-                    RecycleLong(item.longView);
-                    _active.RemoveAt(i);
-                }
+                Recycle(item.view);
+                _active.RemoveAt(i);
             }
-            else
-            {
-                //  생성 시점부터 경과한 시간 기준으로 이동
-                float elapsedTime = now - item.spawnTime;
-                float x = spawnStartX + (elapsedTime * scrollSpeedPx);
 
-                item.rect.anchoredPosition = new Vector2(x, item.rect.anchoredPosition.y);
-
-                // 판정선을 지나고 일정 시간 후 회수
-                if (now > item.data.Timesec + despawnLagSec)
-                {
-                    RecycleSingle(item.rect);
-                    _active.RemoveAt(i);
-                }
-            }
         }
+
     }
+
 
     #region - 노트 생성
     void SpawnOne(NoteData n)
     {
-        bool isLong = (n.type == NoteType.LongNote);
+        var view = GetNote();
+        view.gameObject.SetActive(true);
 
-        if (isLong)
+        // 1) 그리드에서 시작/목표 셀 인덱스 뽑기
+        var (sr, sc) = grid.GetRandomEdgeIndex();
+        var (tr, tc) = grid.GetRandomInnerIndex();
+
+        Vector2 startLocal = grid.GetCellLocalPos(sr, sc);
+        Vector2 targetLocal = grid.GetCellLocalPos(tr, tc);
+
+        // 2) UI 노트 초기화 (이동/시간은 UINoteView가 처리)
+        view.Init(noteLayer, startLocal, targetLocal, conductor, n.Timesec);
+
+        // 3) 스프라이트 적용 (기존 spriteSet 그대로 사용)
+        var img = view.GetComponentInChildren<Image>();
+        if (img != null && spriteSet != null)
         {
-            var view = GetLong();
-            view.gameObject.SetActive(true);
-
-            view.spriteSet = spriteSet;
-            view.scrollSpeed = scrollSpeedPx;
-
-            view.startTimeSec = n.Timesec;
-            view.durationSec = n.durationSec;
-
-            view.spawnTimeSec = conductor.NowSec;
-
-            view.UpdateVisual(conductor.NowSec);
-
-            _active.Add(new ActiveItem
-            {
-                data = n,
-                longView = view,
-                rect = null,
-                isLong = true,
-                spawnTime = conductor.NowSec  
-            });
+            var sp = spriteSet.GetSprite(n.key); // 또는 key 기준으로 바꿀 수도 있음
+            if (sp != null)
+                img.sprite = sp;
         }
-        else
+
+        // 디버그 로그
+        Debug.Log($"[NoteSpawner] Spawn Note -> id={n.id}, type={n.type}, timeSec={n.Timesec:F3}");
+
+        // 4) 활성 리스트에 등록 (Despwn 관리)
+        _active.Add(new ActiveItem
         {
-            var rect = GetSingle();
-            rect.gameObject.SetActive(true);
-            rect.SetParent(noteLayer, false);
-
-            // 스프라이트 적용
-            var img = rect.GetComponentInChildren<Image>();
-            if (img != null && spriteSet != null)
-            {
-                var sp = spriteSet.GetSprite(n.type);
-                if (sp == null) { }
-                 
-                else
-                    img.sprite = sp;
-            }
-
-            // 노트는 왼쪽 spawnStartX에서 생성, Y는 고정
-            float x = spawnStartX;
-            float y = noteY;  // 고정된 Y 위치
-
-            rect.anchoredPosition = new Vector2(x, y);
-            
-
-            //노트 디버깅
-            var d = _notes[_nextSpawn];
-            Debug.Log($"[NoteSpawner] Spawn Note -> id={d.id}, type={d.type}, timeSec={d.Timesec:F3}");
-
-            _active.Add(new ActiveItem
-            {
-                data = n,
-                rect = rect,
-                longView = null,
-                isLong = false,
-                spawnTime = conductor.NowSec  
-            });
-        }
+            data = n,
+            view = view
+        });
     }
     #endregion
 
-    RectTransform GetSingle()
-    {
-        if (_singlePool.Count > 0) return _singlePool.Pop();
-        return Instantiate(singleNotePrefab, noteLayer);
-    }
-
-    void RecycleSingle(RectTransform rt)
-    {
-        rt.gameObject.SetActive(false);
-        rt.SetParent(noteLayer, false);
-        _singlePool.Push(rt);
-    }
-
-    LongNoteView GetLong()
-    {
-        if (longNotePrefab == null) return null;
-        if (_longPool.Count > 0) return _longPool.Pop();
-        return Instantiate(longNotePrefab, noteLayer);
-    }
-
-    void RecycleLong(LongNoteView v)
-    {
-        if (v == null) return;
-        v.gameObject.SetActive(false);
-        v.transform.SetParent(noteLayer, false);
-        _longPool.Push(v);
-    }
 }

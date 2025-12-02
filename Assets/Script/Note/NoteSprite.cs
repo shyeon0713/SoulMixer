@@ -4,78 +4,37 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NoteSprite", menuName = "Scriptable Objects/Note Sprite Set")]
 public class NoteSprite : ScriptableObject
 {
-    [Header("모든 노트/롱 파츠 스프라이트를 한 리스트에 관리")]
-    public List<Sprite> noteSprites = new();
-
-    [Header("노트 타입 → 스프라이트 인덱스 매핑 총 5가지")]
-    public int[] indexMap = new int[5] { 0, 1, 2, 3, 4 };
-
-    [Header("롱노트 파츠 인덱스 (noteSprites 기준)")]
-    public int longHeadIndex = 5;
-    public int longBodyIndex = 6; // 9-slice 또는 타일링 권장
-    public int longTailIndex = 7;
-
+    [Header("입력 키별 노트 스프라이트")]
+    [Tooltip("인덱스 순서: 0=W, 1=A, 2=S, 3=D, 4=Up, 5=Down, 6=Left, 7=Right, 8= 1, 9= 2 ...")]
+    public Sprite[] keySprites = new Sprite[12];
 
     [Header("유효하지 않을 때 대체 스프라이트(선택)")]
     public Sprite fallbackSprite;
 
-    public Sprite GetSprite(NoteType type)
+    /// NoteKey enum 기준으로 스프라이트 반환
+    public Sprite GetSprite(NoteKey key)
     {
-        if (indexMap == null || noteSprites == null || noteSprites.Count == 0)
+        int idx = (int)key;
+
+        if (keySprites == null || idx < 0 || idx >= keySprites.Length)
             return fallbackSprite;
 
-        int t = (int)type;
+        var sp = keySprites[idx];
+        return sp != null ? sp : fallbackSprite;
+    }
 
-        // enum 값이 0~4 범위인지 검사
-        if (t < 0 || t >= indexMap.Length)
+
+    /// JSON에서 온 string key(W, A, S, D, Up, Down, Left, Right, Num 1 ~6)를 받아서 스프라이트 반환
+   
+    public Sprite GetSpriteByKeyString(string keyString)
+    {
+        if (string.IsNullOrEmpty(keyString))
             return fallbackSprite;
 
-        int idx = indexMap[t];
-
-        if (idx < 0 || idx >= noteSprites.Count)
+        // 문자열을 NoteKey enum으로 변환 시도
+        if (!System.Enum.TryParse(keyString, ignoreCase: true, out NoteKey keyEnum))
             return fallbackSprite;
 
-        return noteSprites[idx];
+        return GetSprite(keyEnum);
     }
-
-    #region- 롱노트
-    public Sprite GetLongHead() => GetAt(longHeadIndex);
-    public Sprite GetLongBody() => GetAt(longBodyIndex);
-    public Sprite GetLongTail() => GetAt(longTailIndex);
-
-
-    private Sprite GetAt(int i)
-    {
-        if (noteSprites == null || noteSprites.Count == 0) return fallbackSprite;
-        return (i >= 0 && i < noteSprites.Count) ? noteSprites[i] : fallbackSprite;
-    }
-    #endregion
-
-#if UNITY_EDITOR
-    private void UpdateNote()
-    {
-        
-        if (indexMap == null || indexMap.Length != 4)
-        {
-            var old = indexMap;
-            indexMap = new int[5] { 0, 1, 2, 3,4};
-            if (old != null)
-            {
-                for (int i = 0; i < Mathf.Min(old.Length, 5); i++)
-                    indexMap[i] = old[i];
-            }
-        }
-
-        // 음수 방지
-        longHeadIndex = Mathf.Max(0, longHeadIndex);
-        longBodyIndex = Mathf.Max(0, longBodyIndex);
-        longTailIndex = Mathf.Max(0, longTailIndex);
-
-        // 상한 보정
-        int max = (noteSprites != null && noteSprites.Count > 0) ? noteSprites.Count - 1 : 0;
-        longHeadIndex = Mathf.Min(longHeadIndex, max);
-        longBodyIndex = Mathf.Min(longBodyIndex, max);
-        longTailIndex = Mathf.Min(longTailIndex, max);
-    }
-#endif
 }

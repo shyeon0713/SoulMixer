@@ -15,17 +15,25 @@ public static class ChartLoader {
         }
 
         var list = new List<NoteData>(chart.notes.Count);
+
         foreach (var n in chart.notes)
         {
-            if (!Enum.TryParse(n.type, out NoteType t))
-                t = NoteType.NormalNote_L;
+            // 1) 타입 파싱 (스프라이트용, 실패하면 Normal로 기본값)
+            NoteType t;
+            if (!Enum.TryParse(n.type, out t))
+                t = NoteType.Normal; // 혹은 Normal 같은 공통 타입으로
 
+            // 2) NoteData 채우기
             list.Add(new NoteData
             {
                 id = n.id,
                 type = t,
                 Timesec = n.timeSec,
-                durationSec = n.durationSec
+                // durationSec는 안 쓰니까 생략 가능
+                // durationSec = n.durationSec,
+
+                // 새 필드: 키보드 키 정보
+                key = n.key    // string
             });
         }
 

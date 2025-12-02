@@ -37,5 +37,42 @@ public class FieldGrid : MonoBehaviour
     {
         return cellLocalPos[row, col];
     }
+
+    // °¡ÀåÀÚ¸® ¼¿ ÀÎµ¦½º ·£´ý
+    public (int row, int col) GetRandomEdgeIndex()
+    {
+        int r, c;
+        int side = Random.Range(0, 4); // 0=À§,1=¾Æ·¡,2=¿Þ,3=¿À¸¥
+
+        switch (side)
+        {
+            case 0: // À§
+                r = 0;
+                c = Random.Range(0, cols);
+                break;
+            case 1: // ¾Æ·¡
+                r = rows - 1;
+                c = Random.Range(0, cols);
+                break;
+            case 2: // ¿Þ
+                r = Random.Range(0, rows);
+                c = 0;
+                break;
+            default: // ¿À¸¥
+                r = Random.Range(0, rows);
+                c = cols - 1;
+                break;
+        }
+        return (r, c);
+    }
+
+    // ³»ºÎ(°¡ÀåÀÚ¸® Á¦¿Ü) ¼¿ ÀÎµ¦½º ·£´ý
+    public (int row, int col) GetRandomInnerIndex()
+    {
+        int r = Random.Range(1, rows - 1);
+        int c = Random.Range(1, cols - 1);
+        return (r, c);
+    }
 }
+
 
