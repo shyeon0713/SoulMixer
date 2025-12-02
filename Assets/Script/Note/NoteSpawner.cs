@@ -11,7 +11,7 @@ public class NoteSpawner : MonoBehaviour
 
     [Header("Prefabs (UGUI)")]
     public RectTransform singleNotePrefab;
-    public LongNoteView longNotePrefab;
+
 
     [Header("Scroll")]
     public float spawnLeadTimeSec = 2.0f;

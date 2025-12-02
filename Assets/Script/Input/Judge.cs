@@ -1,13 +1,12 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
 
 public enum HitGrade { Miss, Good, Great, Perfect }
 
 public class Judge : MonoBehaviour
 {
-    private int _nextIndex;
+    //private int _nextIndex;
 
     [Header("Ref")]
     public Conductor conductor;
@@ -17,17 +16,12 @@ public class Judge : MonoBehaviour
     public int greatMs = 200;
     public int goodMs = 300;
 
-    [Header("롱노트의 판정 시간의 구간읜 폭")]
-    public int longStartMs = 80;
-    public int longEndMs = 80;
+
 
     private NoteData[] _notes;
     private HashSet<int> _consumedNotes = new HashSet<int>(); // 소비된 노트 추적
     private int _idx;
 
-    private bool _holding;
-    private NoteData _activeLong;
-    private int _activeLongIndex = -1;
 
     public Action<NoteData, HitGrade> OnHit;
     public Action<NoteData> OnMiss;
@@ -36,17 +30,19 @@ public class Judge : MonoBehaviour
     public Action OnAllNotesJudged;   // 모든 노트 판정 끝났을 때 호출
 
 
-    private Transform aniP; // 애니메이션이 나올 위치
-
 
     // 새로운 곡 데이터를 로드할 때만 호출 (곡 선택 시)
     public void LoadChart(NoteData[] notes)
     {
-
+        if (notes == null)
+        {
+            _notes = Array.Empty<NoteData>();
+            return;
+        }
         // 시간순으로 정렬
         _notes = new NoteData[notes.Length];
-        System.Array.Copy(notes, _notes, notes.Length);
-        System.Array.Sort(_notes, (a, b) => a.Timesec.CompareTo(b.Timesec));
+         Array.Copy(notes, _notes, notes.Length);
+         Array.Sort(_notes, (a, b) => a.Timesec.CompareTo(b.Timesec));
 
     }
 
@@ -54,9 +50,6 @@ public class Judge : MonoBehaviour
     public void ResetJudgment()
     {
         _idx = 0;
-        _holding = false;
-        _activeLong = default;
-        _activeLongIndex = -1;
         _consumedNotes.Clear();
 
     }
@@ -90,13 +83,6 @@ public class Judge : MonoBehaviour
             // 판정 가능 시간을 벗어난 노트만 Miss 처리
             if (_notes[_idx].Timesec < now - MsToSec(goodMs))
             {
-                // 롱노트가 활성화 중이면 스킵
-                if (_holding && _idx == _activeLongIndex)
-                {
-                    _idx++;
-                    continue;
-                }
-
                 OnMiss?.Invoke(_notes[_idx]);
                 _consumedNotes.Add(_idx);
                 _idx++;
@@ -109,225 +95,93 @@ public class Judge : MonoBehaviour
     }
     #endregion
 
-    #region - 일반 노트 입력시 판정
-    public void TapLeft(double inputDspTime)
-    {
-        FeedTap(NoteType.NormalNote_L, inputDspTime);
-    }
-
-    public void TapRight(double inputDspTime)
-    {
-        FeedTap(NoteType.NormalNote_R, inputDspTime);
-    }
-
-    void FeedTap(NoteType type, double inputDspTime)
+    #region - 키보드 입력 
+    public void OnKeyHit(NoteKey key, double inputDspTime)
     {
         if (_notes == null || _notes.Length == 0 || conductor == null)
             return;
 
+        // DSP 기준 현재 시간(초) 계산
         float t = (float)(inputDspTime - conductor.dspStart) + conductor.userOffsetms / 1000f;
 
-
-        // 수정: t를 기준으로 정리
+        // 현재 시각 기준으로 지나간 노트 정리
         CullPastNotes(t);
 
-        int best = -1;
-        float bestDiff = 999f;
+        // 실제 판정
+        FeedTap(key, t);
+    }
+    #endregion
+
+    #region - 특정 키를 기준으로 가장 가까운 노트를 찾아 판정
+    void FeedTap(NoteKey key, float nowSec)
+    {
+
+        int bestIndex = -1;
+        float bestDiff = float.MaxValue;
         float judgmentWindow = MsToSec(goodMs);
 
-        // 수정: 범위 내 모든 노트 검색
+        // _idx부터 앞으로 보면서 "같은 키" + "시간차가 가장 작은 노트" 찾기
         for (int i = _idx; i < _notes.Length; i++)
         {
             // 이미 소비된 노트는 스킵
             if (_consumedNotes.Contains(i))
                 continue;
 
-            // 타입이 다르면 스킵
-            if (_notes[i].type != type)
+            // 키가 다르면 스킵 -> 자료형이 맞지 않아 해당 방식으로 수정
+            if (!string.Equals(_notes[i].key, key.ToString(), StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            float diff = _notes[i].Timesec - t;
+            float diff = _notes[i].Timesec - nowSec;
             float absDiff = Mathf.Abs(diff);
 
-            // 판정 범위를 벗어난 미래 노트는 종료
+            // 너무 미래 노트(현재 시각 기준 good 윈도우 밖)는 더 이상 볼 필요 없음
             if (diff > judgmentWindow)
                 break;
 
-            // 가장 가까운 노트 찾기
+            // 가장 가까운 노트 갱신
             if (absDiff < bestDiff)
             {
                 bestDiff = absDiff;
-                best = i;
+                bestIndex = i;
             }
         }
 
-        // 판정 처리
-        if (best < 0)
+        // 매칭되는 노트를 못 찾았다면 Miss
+        if (bestIndex < 0)
         {
-            OnMiss?.Invoke(new NoteData { type = type, Timesec = t });
+            // 어떤 노트와도 매칭 안 된 Miss. 필요하다면 가짜 NoteData 만들어 전달
+            OnMiss?.Invoke(new NoteData
+            {
+                id = -1,
+                Timesec = nowSec,
+                key = key.ToString()
+            });
             return;
         }
 
-        var grade = GradeFromDelta(_notes[best].Timesec - t);
-        float deltaMs = (_notes[best].Timesec - t) * 1000f;
+        // 판정 등급 계산
+        float deltaSec = _notes[bestIndex].Timesec - nowSec;
+        var grade = GradeFromDelta(deltaSec);
 
         if (grade == HitGrade.Miss)
         {
-            OnMiss?.Invoke(_notes[best]);
+            OnMiss?.Invoke(_notes[bestIndex]);
             return;
         }
 
-        //  수정: 성공 판정 시 노트 소비
-        OnHit?.Invoke(_notes[best], grade);
+        // 성공 판정
+        OnHit?.Invoke(_notes[bestIndex], grade);
 
-        //PlayNoteAnimation(_notes[best]);   //애니메이션 출력
-        // 애니메이션이 너무 빨라서 마우스 입력부분에 넣을 예정
-        _consumedNotes.Add(best);
+        // 소비 처리
+        _consumedNotes.Add(bestIndex);
 
+        // 모든 노트 판정 완료 체크
         CheckAllNotesJudged();
     }
+
     #endregion
 
-    #region 롱노트 시작부분
-    public void LongNoteStart(double inputDsptime)
-    {
-        if (_notes == null || _notes.Length == 0 || conductor == null)
-            return;
 
-        float t = (float)(inputDsptime - conductor.dspStart) + conductor.userOffsetms / 1000f;
-        float w = MsToSec(longStartMs);
-
-        int best = -1;
-        float bestDiff = 999f;
-
-        for (int i = _idx; i < _notes.Length; i++)
-        {
-            if (_consumedNotes.Contains(i))
-                continue;
-
-            if (_notes[i].type != NoteType.LongNote)
-                continue;
-
-            float diff = _notes[i].Timesec - t;
-            float absDiff = Mathf.Abs(diff);
-
-            if (diff > w)
-                break;
-
-            if (absDiff < bestDiff)
-            {
-                bestDiff = absDiff;
-                best = i;
-            }
-        }
-
-        if (best < 0 || bestDiff > w)
-        {
-            OnMiss?.Invoke(new NoteData { type = NoteType.LongNote, Timesec = t });
-            return;
-        }
-
-        _activeLong = _notes[best];
-        _activeLongIndex = best;
-        _holding = true;
-
-        var grade = GradeFromDelta(_activeLong.Timesec - t);
-
-        OnHit?.Invoke(_activeLong, grade);
-
-        //PlayNoteAnimation(_activeLong);  // 롱노트 애니메이션 출력
-        // 애니메이션이 너무 빨라서 마우스 입력부분에 넣을 예정
-        _consumedNotes.Add(best);
-    }
-    #endregion
-
-    #region -롱노트 해제부분
-    public void LongNoteEnd(double inputDspTime)
-    {
-        if (!_holding || _notes == null || conductor == null)
-            return;
-
-        float t = (float)(inputDspTime - conductor.dspStart) + conductor.userOffsetms / 1000f;
-        float endTime = _activeLong.Timesec + _activeLong.durationSec;
-        float w = MsToSec(longEndMs);
-
-        if (Mathf.Abs(endTime - t) <= w)
-        {
-            var grade = GradeFromDelta(endTime - t);
-
-            OnHit?.Invoke(_activeLong, grade);
-        }
-        else
-        {
-
-            OnMiss?.Invoke(_activeLong);
-        }
-
-        _holding = false;
-        _activeLongIndex = -1;
-    }
-    #endregion
-
-    #region 슬라이드
-    public void FeedSlide(int dir, double inputDspTime)
-    {
-        if (_notes == null || _notes.Length == 0 || conductor == null)
-            return;
-
-        var targetType = (dir < 0) ? NoteType.SlideNote_L : NoteType.SlideNote_R;
-        float t = (float)(inputDspTime - conductor.dspStart) + conductor.userOffsetms / 1000f;
-
-        CullPastNotes(t);
-
-        int best = -1;
-        float bestDiff = 999f;
-        float judgmentWindow = MsToSec(goodMs);
-
-        for (int i = _idx; i < _notes.Length; i++)
-        {
-            if (_consumedNotes.Contains(i))
-                continue;
-
-            if (_notes[i].type != targetType)
-                continue;
-
-            float diff = _notes[i].Timesec - t;
-            float absDiff = Mathf.Abs(diff);
-
-            if (diff > judgmentWindow)
-                break;
-
-            if (absDiff < bestDiff)
-            {
-                bestDiff = absDiff;
-                best = i;
-            }
-        }
-
-        if (best < 0)
-        {
-
-            OnMiss?.Invoke(new NoteData { type = targetType, Timesec = t });
-            return;
-        }
-
-        var grade = GradeFromDelta(_notes[best].Timesec - t);
-
-        if (grade == HitGrade.Miss)
-        {
-            OnMiss?.Invoke(_notes[best]);
-            return;
-        }
-
-
-        OnHit?.Invoke(_notes[best], grade);
-
-       // PlayNoteAnimation(_notes[best]);  // 슬라이드노트 애니메이션 출력
-       // 애니메이션이 너무 빨라서 마우스 입력부분에 넣을 예정
-        _consumedNotes.Add(best);
-        CheckAllNotesJudged();
-    }
-    #endregion
 
     #region - 모든 노트판정이 끝난 뒤, GameEntry에 모든 판정이 끝났음을 전달 
     private void CheckAllNotesJudged()
@@ -345,43 +199,6 @@ public class Judge : MonoBehaviour
 
     #endregion
 
-    #region -GameEntry에서 호출해줄 설정 함수
-    public void SetAnimation(Transform target)
-    {
-        this.aniP = target;
-    }
-
-    #endregion
-
-    #region - 지정된 애니메이션 출력 
-    private void PlayNoteAnimation(NoteData note)
-    {
-        if (aniP == null) return; // 애니메이션이 작동할 위치가 설정 되어 있지않을 경우 중단
-
-        string targetAnimName = "";
-
-        switch (note.type)  // 노트 타입에 따라 이름 배정
-        {
-            case NoteType.NormalNote_L:
-            case NoteType.NormalNote_R:
-                targetAnimName = "Shake";
-                break;
-
-            case NoteType.SlideNote_L:
-            case NoteType.SlideNote_R:
-                targetAnimName = "Pour"; // 변수에 "Shake"라는 글자를 담음
-                break;
-
-            case NoteType.LongNote:
-                targetAnimName = "Stir";
-                break;
-        }
-
-        if (!string.IsNullOrEmpty(targetAnimName))
-        {
-            // 여기서 targetAnimName 변수를 사용하고 끝!
-            AnimationManager.instance.PlayAnimation(targetAnimName, aniP.position);
-        }
-        #endregion
-    }
+   
+    
 }
