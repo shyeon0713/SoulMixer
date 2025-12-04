@@ -11,9 +11,17 @@ public class DialogueLine
 }
 
 [System.Serializable]
+public class NpcEntry  //화면에 출력될 NPC
+{
+    public string name;         
+    public bool visible;   
+}
+
+[System.Serializable]
 public class DialogueData
 {
-    public List<DialogueLine> dialogues;   //List로 대화 가져오기 -> 추후에 상황보고 Dictionary로 수정
+    public List<DialogueLine> dialogues;   //List로 대화 가져오기 
+    public List<NpcEntry> npcs;
 }
 
 public class DialogueLoader : MonoBehaviour
