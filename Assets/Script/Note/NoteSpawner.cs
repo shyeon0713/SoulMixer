@@ -1,22 +1,20 @@
 ﻿using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class NoteSpawner : MonoBehaviour
 {
-    [Header("Refs")]
+    [Header("참조 오브젝트")]
     public Conductor conductor;
     public NoteSprite spriteSet;
     public FieldGrid grid;
     public RectTransform noteLayer;   //그리드 보드와 같은 오브젝트
 
-    [Header("Prefabs (UGUI)")]
+    [Header("프리팹")]
     public UINoteView notePrefab;
-
-
-    [Header("Time")]
-    public float pathPreview = 2f; // 2초전에 노트가 이동하는 경로 표시
-    public float despawnLagSec = 1.0f;  // 판정 후 몇 초 뒤에 회수할지
+    [Header("경로 하이라이트 프리팹 이미지")]
+    public float pathPreviewTime = 2f;
 
     [Header("Pooling")]
     public int initialPoolSize = 64;
@@ -26,13 +24,24 @@ public class NoteSpawner : MonoBehaviour
 
     private readonly List<ActiveItem> _active = new();
     private readonly Stack<UINoteView> _pool = new();
+    private readonly List<PendingPreview> _pendingPreviews = new();
 
+    #region - 내부 구조 정의
     struct ActiveItem
     {
         public NoteData data;
         public UINoteView view;
 
     }
+    private class PendingPreview    // 노트가 이동할 경로를 2초전에 화면에 출력
+    {
+        public float showTime;
+        public List<(int r, int c)> path;
+        public bool shown;
+    }
+
+    #endregion 
+
 
     #region Json파일 로드 / 리셋
     public void LoadChart(NoteData[] notes)
@@ -45,33 +54,23 @@ public class NoteSpawner : MonoBehaviour
         //  Debug.Log($"[NoteSpawner] LoadChart: {_notes?.Length ?? 0} notes loaded");
     }
 
-    // 스폰 상태 리셋 (곡 재시작 시)
     public void ResetSpawner()
     {
         _nextSpawn = 0;
 
-        for (int i = _active.Count - 1; i >= 0; i--)
-        {
-            Recycle(_active[i].view);
-        }
-        _active.Clear();
+        foreach (var n in _active)
+            Recycle(n.view);
 
-        Debug.Log("[NoteSpawner] Spawner reset");
+        _active.Clear();
+        _pendingPreviews.Clear();
+        grid.ClearHighlights();
     }
 
     #endregion
 
- 
-
     #region - 풀링 
     void WarmupPool()
     {
-        if (notePrefab == null || noteLayer == null)
-        {
-            Debug.LogWarning("[NoteSpawner] WarmupPool: prefab 또는 noteLayer가 비어 있음");
-            return;
-        }
-
         for (int i = _pool.Count; i < initialPoolSize; i++)
         {
             var inst = Instantiate(notePrefab, noteLayer);
@@ -80,101 +79,176 @@ public class NoteSpawner : MonoBehaviour
         }
     }
 
-    // ViewUI의 노트 프리팹 배치
-    UINoteView GetNote()   
+    private UINoteView GetNote()
     {
         if (_pool.Count > 0)
             return _pool.Pop();
 
         return Instantiate(notePrefab, noteLayer);
     }
-    //
+
 
     // 노트 재활용
-    void Recycle(UINoteView view)
+    private void Recycle(UINoteView view)
     {
-        if (view == null) return;
         view.gameObject.SetActive(false);
         view.transform.SetParent(noteLayer, false);
         _pool.Push(view);
     }
+
     #endregion
 
 
-
-    void Update()
+    private void Update()
     {
-        if (_notes == null || conductor == null || noteLayer == null || grid == null)
+        if (_notes == null || conductor == null || grid == null)
             return;
 
         float now = conductor.NowSec;
 
-        // 스폰 조건: 판정 시간까지 남은 시간이 spawnLeadTimeSec 이하
+        ProcessSpawn(now);
+        ProcessPreviews(now);
+        ProcessDespawn(now);
+    }
+
+    #region - 노트 스폰 및 하이라이트 생성 + 제거
+    // 노트 스폰
+    private void ProcessSpawn(float now)
+    {
         while (_nextSpawn < _notes.Length)
         {
-            var n = _notes[_nextSpawn];
-            float spawnTime = n.Timesec - n.moveTime;  // 전체 시간 - 이동시간 빼기  = 스폰 시간 
+            var note = _notes[_nextSpawn];
+
+            // 스폰타임 = 판정시간 - 이동시간 + 미리보기 시간
+            float spawnTime = note.Timesec - note.moveTime;
 
             if (now >= spawnTime)
             {
-                SpawnOne(n);
+                SpawnOne(note);
                 _nextSpawn++;
             }
-            else
-            {
-                break;
-            }
+            else break;
         }
+    }
 
-        // Despawn: 판정 시간 + 여유 시간 지났으면 회수
-        for (int i = _active.Count - 1; i >= 0; i--)
+    // 경로 하이라이트 출력
+    private void ProcessPreviews(float now)
+    {
+        foreach (var preview in _pendingPreviews)
         {
-            var item = _active[i];
-            float despawnTime = item.data.Timesec + 
-                item.data.judgeTime + despawnLagSec;
-            if (now > despawnTime)
+            if (!preview.shown && now >= preview.showTime)
             {
-                Recycle(item.view);
-                _active.RemoveAt(i);
+                grid.HighlightPath(preview.path);
+                preview.shown = true;
             }
         }
     }
 
 
-    #region - 노트 생성
+    // 노트 및 경로 하이라이트 제거
+    private void ProcessDespawn(float now)
+    {
+        for (int i = _active.Count - 1; i >= 0; i--)
+        {
+            var item = _active[i];
+
+            if (now > item.data.Timesec + item.data.judgeTime + 1.0f)   // 판정 후 제거
+            {
+                Recycle(item.view);
+                _active.RemoveAt(i);
+
+                // 경로 하이라이트도 지워준다
+                grid.ClearHighlights();
+            }
+        }
+    }
+
+    #endregion
+
+    #region - 노트 스폰 처리
     void SpawnOne(NoteData n)
     {
+        // 시작 칸 랜덤 선택
+        string edge = GetRandomEdge();
+        int index = GetRandomEdgeIndex(edge);
+        var (sr, sc) = grid.GetEdgeIndexByJson(edge, index);
+
+        // 랜덤 워크 활용 -> 경로 생성 
+        int pathLength = Random.Range(n.minpath, n.maxpath + 1);
+        var path = grid.GenerateRandomWalk(sr, sc, pathLength);
+
+        // 목적지
+        var (tr, tc) = path[path.Count - 1];
+
+        // 실제 스폰 + 노트 이동 설정 
+        Vector2 posStart = grid.GetCellLocalPos(sr, sc);
+        Vector2 posTarget = grid.GetCellLocalPos(tr, tc);
+
         var view = GetNote();
         view.gameObject.SetActive(true);
 
-        // 1) 그리드에서 시작/목표 셀 인덱스 가져오기 (엣지→엣지)
-        var (sr, sc) = grid.GetEdgeIndexByJson(n.spawnEdge, n.spawnIndex);
-        var (tr, tc) = grid.GetTargetFromSpawn(n.spawnEdge, n.spawnIndex, n.targetEdge);
+        view.Init(
+           noteLayer,
+           posStart,
+           posTarget,
+           conductor,
+           n.Timesec
+       );
 
-        Vector2 startLocal = grid.GetCellLocalPos(sr, sc);
-        Vector2 targetLocal = grid.GetCellLocalPos(tr, tc);
-
-        // 2) UI 노트 초기화 (이동/시간은 UINoteView가 처리)
-        view.Init(noteLayer, startLocal, targetLocal, conductor, n.Timesec);
-
-        // 3) 스프라이트 적용 (기존 spriteSet 그대로 사용)
+        // 스프라이트 적용
         var img = view.GetComponentInChildren<Image>();
-        if (img != null && spriteSet != null)
+        if (img != null)
         {
-            var sp = spriteSet.GetSpriteByKeyString(n.key); // 수정 - 노트가 아닌 NoteData.key기반으로 스프라이트를 가져와야하므로 수정
-            if (sp != null)
-                img.sprite = sp;
+            Sprite sp = spriteSet.GetSpriteByKeyString(n.key);
+            img.sprite = sp;
         }
 
-        // 디버그 로그
-        Debug.Log($"[NoteSpawner] Spawn Note -> id={n.id}, type={n.type}, timeSec={n.Timesec:F3}");
 
-        // 4) 활성 리스트에 등록 (Despwn 관리)
+        // 경로 하이라이트
+        _pendingPreviews.Add(new PendingPreview
+        {
+            showTime = n.Timesec - n.moveTime - pathPreviewTime,
+            path = path,
+            shown = false
+        });
+
+        // 활성 리스트 등록
         _active.Add(new ActiveItem
         {
             data = n,
             view = view
         });
+
+        // 
+        Debug.Log($"[NoteSpawner] Spawn Note {n.id} edge={edge}, steps={pathLength}");
+    }
+    #endregion
+
+
+    #region -  랜덤 엣지(가장자리 좌표)설정
+
+    private string GetRandomEdge()
+    {
+        int v = Random.Range(0, 4);
+        return v switch
+        {
+            0 => "top",
+            1 => "bottom",
+            2 => "left",
+            _ => "right",
+        };
+    }
+
+    private int GetRandomEdgeIndex(string edge)
+    {
+        return edge switch
+        {
+            "top" => Random.Range(0, grid.cols),
+            "bottom" => Random.Range(0, grid.cols),
+            "left" => Random.Range(0, grid.rows),
+            "right" => Random.Range(0, grid.rows),
+            _ => 0
+        };
     }
     #endregion
 

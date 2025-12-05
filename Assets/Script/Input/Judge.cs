@@ -181,8 +181,6 @@ public class Judge : MonoBehaviour
 
     #endregion
 
-
-
     #region - 모든 노트판정이 끝난 뒤, GameEntry에 모든 판정이 끝났음을 전달 
     private void CheckAllNotesJudged()
     {
@@ -200,5 +198,4 @@ public class Judge : MonoBehaviour
     #endregion
 
    
-    
 }

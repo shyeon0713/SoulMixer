@@ -18,13 +18,12 @@ public class GridManager : MonoBehaviour
     public void SetGridDiff(Difficulty diff)
     {
 
-
-        //모든 그리트 비활성화 
+        //모든 그리드 비활성화 
         if (easyGrid) { easyGrid.gameObject.SetActive(false); }
         if (normalGrid) { normalGrid.gameObject.SetActive(false); }
         if (hardGrid) { hardGrid.gameObject.SetActive(false); }
 
-        //난이도에 따라 그리드 활성화
+        //난이도 할당
         switch (diff)
         {
             case Difficulty.Easy:
@@ -61,14 +60,6 @@ public class GridManager : MonoBehaviour
     public FieldGrid GetCurrentGrid()   
     {
         return currentGrid;
-    }
-
-    public void ClearAllHighlight()
-    {
-        if (!currentGrid) return;
-
-        foreach (var cell in currentGrid.cells)
-            cell.SetHighlight(false);
     }
 
 }

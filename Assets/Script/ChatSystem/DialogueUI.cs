@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 [System.Serializable]
 public class SpeakerSpriteSet
@@ -19,6 +20,8 @@ public class DialogueUI : MonoBehaviour
     public Button nextscript;
 
     public DialogueLoader dialogueLoader;   // 대사 가져오기
+
+    public System.Action OnDialogueComplete; // 대사 출력이 전부 끝났는지 판별
 
     [Header("Text UI 부분")]
     public TMP_Text npcnametext;
@@ -50,6 +53,8 @@ public class DialogueUI : MonoBehaviour
 
         dialogueLoader.LoadScenario("conversation");
         nextscript.onClick.AddListener(NextLine); // 버튼 리스너 연결
+
+        OnDialogueComplete += HandleDialogueEnd;
 
         BuildImageBank();
         BuildSpriteBank();
@@ -137,6 +142,8 @@ public class DialogueUI : MonoBehaviour
         if (currentLine >= dialogueLoader.dialoguedata.dialogues.Count)
         {
             nextscript.interactable = false;
+
+            OnDialogueComplete?.Invoke();
             return;
         }
 
@@ -240,4 +247,22 @@ public class DialogueUI : MonoBehaviour
             imageBank[speaker].rectTransform.anchoredPosition = targetPos;
     }
     #endregion
+
+
+    void HandleDialogueEnd()
+    {
+        var data = dialogueLoader.dialoguedata;
+
+        if (!string.IsNullOrEmpty(data.nextSong))
+        {
+            GameEntry gameEntry = FindObjectOfType<GameEntry>();
+            gameEntry.SelectSong(data.nextSong, data.nextDifficulty);
+
+            SceneManager.LoadScene("RhythmScene");
+        }
+        else
+        {
+            Debug.Log("다음 곡 정보가 없어 스킵됩니다.");
+        }
+    }
 }

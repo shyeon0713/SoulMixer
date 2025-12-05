@@ -4,44 +4,58 @@ using UnityEngine;
 
 public static class ChartLoader {
 
-
+    //노트 데이터 파싱
     public static NoteData[] LoadFromJsonText(string json)
     {
-        var chart = JsonUtility.FromJson<SongChartJson>(json);
-        if (chart == null || chart.notes == null)
+        var root = JsonUtility.FromJson<ChartRoot>(json);
+       
+        if (root == null || root.notes == null)
         {
             Debug.LogError("[ChartLoader] Json 파싱 실패 또는 chart.notes == null");
             return Array.Empty<NoteData>();
         }
 
-        var list = new List<NoteData>(chart.notes.Count);
+        List<NoteData> list = new();
 
-        foreach (var n in chart.notes)
+        foreach (var n in root.notes)
         {
-            // 1) 타입 파싱 (스프라이트용, 실패하면 Normal로 기본값)
-            NoteType t;
-            if (!Enum.TryParse(n.type, out t))
-                t = NoteType.Normal; // 혹은 Normal 같은 공통 타입으로
+            // NoteType 파싱 실패시 기본 Normal 처리
+            NoteType noteType = NoteType.Normal;
+            if (!Enum.TryParse(n.type.ToString(), out noteType))
+                noteType = NoteType.Normal;
 
-            // 2) NoteData 채우기
-            list.Add(new NoteData
+            // NoteData로 변환
+            NoteData data = new NoteData
             {
                 id = n.id,
-                type = t,
-                Timesec = n.timeSec,
-                // durationSec는 안 쓰니까 생략 가능
-                // durationSec = n.durationSec,
+                type = noteType,
+                Timesec = n.Timesec,
+                key = n.key,
 
-                // 새 필드: 키보드 키 정보
-                key = n.key    // string
-            });
+                // 출발 Edge
+                spawnEdge = n.spawnEdge,
+                spawnIndex = n.spawnIndex,
+
+                // 경로 길이 범위
+                minpath = n.minpath,
+                maxpath = n.maxpath,
+
+                // 이동 / 판정 시간
+                moveTime = n.moveTime,
+                judgeTime = n.judgeTime
+
+            };
+
+            list.Add(data);
         }
-
+        // 시간 기준 정렬
         list.Sort((a, b) => a.Timesec.CompareTo(b.Timesec));
+
         return list.ToArray();
     }
 
 
+    // 곡 선택에 따라 해당 json파일 파싱
     public static NoteData[] LoadFromSongEntry(SongEntry songEntry, Difficulty difficulty)
     {
         if (songEntry == null)

@@ -5,14 +5,25 @@ using UnityEngine;
 
 
 [Serializable]
-public class NoteJson
+public class NoteJson  
 {
     public int id;
-    public string type;  // 노트 타입 명시
-    public float timeSec; //판정 시간
 
-    public string key;
-   
+    public NoteType type;
+    public float Timesec; //판정시간(초단위)
+
+    public string key; // 입력받을 키보드 키
+
+    // 출발 위치(엣지)
+    public string spawnEdge;
+    public int spawnIndex;
+
+    // 경로 길이 범위
+    public int minpath;
+    public int maxpath;
+
+    public float moveTime;   // 이동 시간
+    public float judgeTime;  // 판정 유지 시간
 }
 
 

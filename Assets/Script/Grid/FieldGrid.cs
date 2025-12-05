@@ -1,5 +1,7 @@
-using UnityEngine;
+using NUnit.Framework;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class FieldGrid : MonoBehaviour
 {
@@ -7,7 +9,8 @@ public class FieldGrid : MonoBehaviour
     public int rows;    // 예: Easy 3, Normal 4, Hard 5
     public int cols;    // 예: Easy 4, Normal 5, Hard 6
 
-    [Header("Cell 오브젝트 (자동 스캔됨)")]
+    [Header("참조")]
+    public HighlightPool highlightPool;
     public GridCell[,] cells;
 
     private void Awake()
@@ -15,86 +18,130 @@ public class FieldGrid : MonoBehaviour
         BuildCellArray();
     }
 
-    /// <summary>
-    /// 하위 오브젝트에서 GridCell을 자동 스캔하여
-    /// row/col 인덱스에 맞춰 2D 배열로 구성
-    /// </summary>
+
+    // 셀을 2차원 배열 방식으로 구성
     private void BuildCellArray()
     {
         var cellList = GetComponentsInChildren<GridCell>(true);
-
-        if (cellList.Length != rows * cols)
-        {
-            Debug.LogWarning($"[FieldGrid] 셀 개수({cellList.Length})가 rows*cols({rows * cols})와 일치하지 않습니다.");
-        }
-
         cells = new GridCell[rows, cols];
 
-        foreach (var cell in cellList)
+        foreach (var c in cellList)
         {
-            if (cell.rect == null)
-                cell.rect = cell.GetComponent<RectTransform>();
+            if (c.row < rows && c.col < cols)
+            {
+                cells[c.row, c.col] = c;
+            }
 
-            cells[cell.row, cell.col] = cell;
+            else  // 셀 좌표가 해당 그리드보다 초과될 경우
+                Debug.LogWarning($"[FieldGrid] 셀 좌표 초과: ({c.row},{c.col})");
+        }
+        Debug.Log($"[FieldGrid] Initialized rows={rows}, cols={cols}, foundCells={cellList.Length}");
+    }
+
+    //셀 위치 반환
+    public Vector2 GetCellLocalPos(int r, int c)
+    {
+        return cells[r, c].rect.anchoredPosition;
+    }
+
+    #region - 하이라이트 부분 출력
+    //셀 하나의 하이라이트 출력
+    public void HighlightCell(int r, int c)
+    {
+        if (cells[r, c] == null)
+        {
+            Debug.LogError($"[FieldGrid] HighlightCell 실패: ({r},{c}) 셀이 null");
+            return;
         }
 
-        Debug.Log("[FieldGrid] GridCell 2D 배열 구성이 완료되었습니다.");
+        var cell = cells[r, c];
+        var img = highlightPool.Get();
+
+        img.rectTransform.anchoredPosition = cell.rect.anchoredPosition;
+        img.rectTransform.sizeDelta = cell.rect.sizeDelta;
     }
 
-    /// <summary>
-    /// 배치된 오브젝트의 RectTransform 좌표를 직접 반환
-    /// </summary>
-    public Vector2 GetCellLocalPos(int row, int col)
+    //경로 전체를 표시
+    public void HighlightPath(List<(int r, int c)> path)
     {
-        return cells[row, col].rect.anchoredPosition;
+        foreach (var (r, c) in path)
+        {
+            HighlightCell(r, c);
+        }
     }
 
+    //모든 하이라이트 제거
+    public void ClearHighlights()
+    {
+        highlightPool.ClearAll();
+    }
 
-    // =========================
-    // JSON 기반 Edge 인덱스 변환
-    // =========================
-    public (int row, int col) GetEdgeIndexByJson(string edge, int index)
+    #endregion
+
+    //Json 기반 가장자리 
+    public (int r, int c) GetEdgeIndexByJson(string edge, int index)
     {
         edge = edge.ToLower();
 
         switch (edge)
         {
             case "top":
+                if (index >= cols) Debug.LogError("[FieldGrid] top index 범위 초과"); 
                 return (0, Mathf.Clamp(index, 0, cols - 1));
+
             case "bottom":
+                if (index >= cols) Debug.LogError("[FieldGrid] bottom index 범위 초과");
                 return (rows - 1, Mathf.Clamp(index, 0, cols - 1));
+
             case "left":
+                if (index >= rows) Debug.LogError("[FieldGrid] left index 범위 초과");
                 return (Mathf.Clamp(index, 0, rows - 1), 0);
+
             case "right":
+                if (index >= rows) Debug.LogError("[FieldGrid] right index 범위 초과");
                 return (Mathf.Clamp(index, 0, rows - 1), cols - 1);
         }
 
-        Debug.LogError($"[FieldGrid] 잘못된 edge: {edge}");
+        Debug.LogError($"[FieldGrid] Unknown edge: {edge}");
         return (0, 0);
     }
 
-    /// <summary>
-    /// 타겟 엣지가 JSON에서 주어졌다면 그 엣지를 기준으로 target 위치를 계산
-    /// 없으면 반대편 엣지를 자동 선택
-    /// </summary>
-    public (int row, int col) GetTargetFromSpawn(string spawnEdge, int spawnIndex, string targetEdge)
+
+
+    // 랜덤 워크 기반 경로 생성 -> 랜덤 위크 알고리즘 활용
+    public List<(int r, int c)> GenerateRandomWalk(int sr, int sc, int steps)
     {
-        if (!string.IsNullOrEmpty(targetEdge))
-            return GetEdgeIndexByJson(targetEdge, spawnIndex);
+        List<(int r, int c)> path = new();
 
-        // 반대편 자동 계산
-        var (sr, sc) = GetEdgeIndexByJson(spawnEdge, spawnIndex);
-        return GetOppositeEdge(sr, sc);
-    }
+        int cr = sr;
+        int cc = sc;
 
-    public (int row, int col) GetOppositeEdge(int r, int c)
-    {
-        if (r == 0) return (rows - 1, c);
-        if (r == rows - 1) return (0, c);
-        if (c == 0) return (r, cols - 1);
-        if (c == cols - 1) return (r, 0);
+        for (int i = 0; i < steps; i++)
+        {
+            List<(int nr, int nc)> candidates = new();
 
-        // edge가 아닌 경우
-        return (r, c);
+            if (cr + 1 < rows) candidates.Add((cr + 1, cc)); // down
+            if (cr - 1 >= 0) candidates.Add((cr - 1, cc)); // up
+            if (cc - 1 >= 0) candidates.Add((cr, cc - 1)); // left
+            if (cc + 1 < cols) candidates.Add((cr, cc + 1)); // right
+
+            if (candidates.Count == 0)
+                break;
+
+            // 직전 셀과 중복 이동 피하기
+            if (path.Count > 1)
+            {
+                var prev = path[path.Count - 2];
+                candidates.Remove(prev);
+            }
+
+            if (candidates.Count == 0)
+                break;
+
+            (cr, cc) = candidates[Random.Range(0, candidates.Count)];
+            path.Add((cr, cc));
+        }
+
+        return path;
     }
 }

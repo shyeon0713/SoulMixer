@@ -7,7 +7,6 @@ public class SongChartJson
 {
     public string title; // ¾Ç°îÁ¦¸ñ
     public float totalsec; //ÀüÃ¼ ½Ã°£ 
-    public ChartCounts counts;
     public float totalLongSec;
     public List<NoteJson> notes;
 }

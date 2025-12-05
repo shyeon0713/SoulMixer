@@ -25,13 +25,16 @@ public class NoteData
 
     public string key; // 입력받을 키보드 키
 
-    public float moveTime; // 이동 시간
-    public float judgeTime; // 판정 창 유지 시간
-
+    // 출발 위치(엣지)
     public string spawnEdge;
-    public int spawnIndex;  // 칸 번호
+    public int spawnIndex;
 
-    public int targetEdge; // 
+    // 경로 길이 범위
+    public int minpath;
+    public int maxpath;
+
+    public float moveTime;   // 이동 시간
+    public float judgeTime;  // 판정 유지 시간
 
 }
 

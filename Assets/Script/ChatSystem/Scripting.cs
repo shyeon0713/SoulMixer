@@ -22,6 +22,10 @@ public class DialogueData
 {
     public List<DialogueLine> dialogues;   //List로 대화 가져오기 
     public List<NpcEntry> npcs;
+
+    // 시나리오 종료 후 자동 진행할 곡 정보
+    public string nextSong;       // 곡 이름
+    public string nextDifficulty; // 난이도(Easy/Normal/Hard)
 }
 
 public class DialogueLoader : MonoBehaviour
