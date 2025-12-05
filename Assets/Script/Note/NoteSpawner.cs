@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 public class NoteSpawner : MonoBehaviour
 {
@@ -16,7 +15,7 @@ public class NoteSpawner : MonoBehaviour
 
 
     [Header("Time")]
-    public float spawnLeadTimeSec = 1.0f;  // 판정  몇 초 전에 스폰할지
+    public float pathPreview = 2f; // 2초전에 노트가 이동하는 경로 표시
     public float despawnLagSec = 1.0f;  // 판정 후 몇 초 뒤에 회수할지
 
     [Header("Pooling")]
@@ -81,14 +80,17 @@ public class NoteSpawner : MonoBehaviour
         }
     }
 
-    UINoteView GetNote()
+    // ViewUI의 노트 프리팹 배치
+    UINoteView GetNote()   
     {
         if (_pool.Count > 0)
             return _pool.Pop();
 
         return Instantiate(notePrefab, noteLayer);
     }
+    //
 
+    // 노트 재활용
     void Recycle(UINoteView view)
     {
         if (view == null) return;
@@ -110,11 +112,12 @@ public class NoteSpawner : MonoBehaviour
         // 스폰 조건: 판정 시간까지 남은 시간이 spawnLeadTimeSec 이하
         while (_nextSpawn < _notes.Length)
         {
-            float timeUntilHit = _notes[_nextSpawn].Timesec - now;
+            var n = _notes[_nextSpawn];
+            float spawnTime = n.Timesec - n.moveTime;  // 전체 시간 - 이동시간 빼기  = 스폰 시간 
 
-            if (timeUntilHit <= spawnLeadTimeSec)
+            if (now >= spawnTime)
             {
-                SpawnOne(_notes[_nextSpawn]);
+                SpawnOne(n);
                 _nextSpawn++;
             }
             else
@@ -127,15 +130,14 @@ public class NoteSpawner : MonoBehaviour
         for (int i = _active.Count - 1; i >= 0; i--)
         {
             var item = _active[i];
-
-            if (now > item.data.Timesec + despawnLagSec)
+            float despawnTime = item.data.Timesec + 
+                item.data.judgeTime + despawnLagSec;
+            if (now > despawnTime)
             {
                 Recycle(item.view);
                 _active.RemoveAt(i);
             }
-
         }
-
     }
 
 
@@ -145,9 +147,9 @@ public class NoteSpawner : MonoBehaviour
         var view = GetNote();
         view.gameObject.SetActive(true);
 
-        // 1) 그리드에서 시작/목표 셀 인덱스 뽑기
-        var (sr, sc) = grid.GetRandomEdgeIndex();
-        var (tr, tc) = grid.GetRandomInnerIndex();
+        // 1) 그리드에서 시작/목표 셀 인덱스 가져오기 (엣지→엣지)
+        var (sr, sc) = grid.GetEdgeIndexByJson(n.spawnEdge, n.spawnIndex);
+        var (tr, tc) = grid.GetTargetFromSpawn(n.spawnEdge, n.spawnIndex, n.targetEdge);
 
         Vector2 startLocal = grid.GetCellLocalPos(sr, sc);
         Vector2 targetLocal = grid.GetCellLocalPos(tr, tc);

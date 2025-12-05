@@ -10,6 +10,7 @@ public class GameEntry : MonoBehaviour
     public Judge judge;
     public NoteSpawner noteSpawner;     // UGUI 스포너
     public AudioSource audioSource;
+    public GridManager gridManager; // 그리드 활성화 부분
 
     [Header("악곡/난이도")]
     public SongEntry selectedSongEntry;
@@ -26,6 +27,10 @@ public class GameEntry : MonoBehaviour
     void Start()
     {
         Debug.Log("[GameEntry] Start 호출");
+        
+        gridManager.SetGridDiff(selectedDifficulty);  // 선택한 난이도에 따라 그리드생성
+        noteSpawner.grid = gridManager.GetCurrentGrid();
+
         // InitAndPlay();
     }
 
