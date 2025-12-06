@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 [System.Serializable]
@@ -48,6 +47,11 @@ public class DialogueUI : MonoBehaviour
     private Coroutine typingCoroutine; // 타이핑 효과를 담당하는 코루틴
 
 
+    [Header("UI 전환")]
+    public GameObject dialoguePanel;
+    public GameObject gamePlayPanel;
+    public GameEntry gameEntry;  // GameEntry 직접 할당
+
     void Start()
     {
 
@@ -81,8 +85,9 @@ public class DialogueUI : MonoBehaviour
         if (data.dialogues != null && data.dialogues.Count > 0)
             OutputDialogue(currentLine);
 
-
     }
+
+
 
     private void BuildImageBank()
     {
@@ -103,15 +108,16 @@ public class DialogueUI : MonoBehaviour
         }
     }
 
-    private void BuildSpriteBank() { 
+    private void BuildSpriteBank()
+    {
 
         spriteBank.Clear(); // 초기화
 
         foreach (var set in spriteSets)
         {
             var dict = new Dictionary<string, Sprite>();
-
             int count = Mathf.Min(set.spriteNames.Count, set.sprites.Count);
+
             for (int i = 0; i < count; i++)
             {
                 string faceName = set.spriteNames[i]; // "happy", "sad" 등
@@ -200,9 +206,11 @@ public class DialogueUI : MonoBehaviour
 
         typingCoroutine = StartCoroutine(TypeText(line.text));
     }
+
+
     #region - 스프라이트 초기화
     // 모든 스프라이트를 하얀색으로 초기화
-    void ResetAllImagesToWhite()  
+    void ResetAllImagesToWhite()
     {
         foreach (var img in imageBank.Values)
             img.color = Color.white;
@@ -223,7 +231,7 @@ public class DialogueUI : MonoBehaviour
         foreach (char c in text)
         {
             dialogueText.text += c;
-           // SoundSetting.Instance.PlaySfx(6);
+            // SoundSetting.Instance.PlaySfx(6);
             yield return new WaitForSeconds(typingDelay);
         }
 
@@ -244,7 +252,7 @@ public class DialogueUI : MonoBehaviour
             _ => centerSlot.anchoredPosition,
         };
 
-            imageBank[speaker].rectTransform.anchoredPosition = targetPos;
+        imageBank[speaker].rectTransform.anchoredPosition = targetPos;
     }
     #endregion
 
@@ -253,16 +261,58 @@ public class DialogueUI : MonoBehaviour
     {
         var data = dialogueLoader.dialoguedata;
 
-        if (!string.IsNullOrEmpty(data.nextSong))
+        if (string.IsNullOrEmpty(data.nextSong))
         {
-            GameEntry gameEntry = FindObjectOfType<GameEntry>();
-            gameEntry.SelectSong(data.nextSong, data.nextDifficulty);
-
-            SceneManager.LoadScene("RhythmScene");
+            Debug.Log("[DialogueUI] 다음 곡 정보가 없어 스킵됩니다.");
+            return;
         }
-        else
+
+        Debug.Log($"[DialogueUI] 대화 종료. 다음 곡: {data.nextSong} ({data.nextDifficulty})");
+
+         // 같은 씬에서 처리
+            StartGameInSameScene(data.nextSong, data.nextDifficulty);
+        
+    }
+    private void StartGameInSameScene(string songId, string difficulty)
+    {
+        Debug.Log($"[DialogueUI] 같은 씬에서 게임 시작: {songId} ({difficulty})");
+
+        // UI 전환
+        if (dialoguePanel != null)
         {
-            Debug.Log("다음 곡 정보가 없어 스킵됩니다.");
+            dialoguePanel.SetActive(false);
+            Debug.Log("[DialogueUI] 대화창 비활성화");
+        }
+
+        if (gamePlayPanel != null)
+        {
+            gamePlayPanel.SetActive(true);
+            Debug.Log("[DialogueUI] 게임 플레이 UI 활성화");
+        }
+
+        // GameEntry 확인
+        if (gameEntry == null)
+        {
+            Debug.LogWarning("[DialogueUI] GameEntry가 Inspector에 할당되지 않음. FindObjectOfType으로 검색 시도...");
+            gameEntry = FindFirstObjectByType<GameEntry>();
+        }
+
+        if (gameEntry == null)
+        {
+            Debug.LogError("[DialogueUI] GameEntry를 찾을 수 없습니다!");
+            return;
+        }
+
+        // 곡 정보 전달 및 시작
+        try
+        {
+            Debug.Log($"[DialogueUI] GameEntry.SelectSong 호출: {songId}, {difficulty}");
+            gameEntry.SelectSong(songId, difficulty);
+            Debug.Log("[DialogueUI] 게임 시작 성공!");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[DialogueUI] 게임 시작 실패: {ex.Message}\n{ex.StackTrace}");
         }
     }
 }

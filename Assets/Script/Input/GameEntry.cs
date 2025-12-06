@@ -24,16 +24,38 @@ public class GameEntry : MonoBehaviour
 
 
     // 테스트용: 씬 켜지면 자동 재생
-    void Start()
+    void Awake()
     {
         Debug.Log("[GameEntry] Start 호출");
-        
-        gridManager.SetGridDiff(selectedDifficulty);  // 선택한 난이도에 따라 그리드생성
-        noteSpawner.grid = gridManager.GetCurrentGrid();
 
-        InitAndPlay();  //튜토리얼에서 넘겨온 경우 자동 시작
+        // 다른 스크립트들의 Awake가 끝날 때까지 대기
+        StartCoroutine(InitializeAfterFrame());
     }
 
+    private IEnumerator InitializeAfterFrame()
+    {
+        // 1프레임 대기 (모든 Awake 완료 보장)
+        yield return null;
+
+        Debug.Log("[GameEntry] 초기화 시작");
+
+        if (gridManager == null)
+        {
+            Debug.LogError("[GameEntry] GridManager가 할당되지 않았습니다!");
+            yield break;
+        }
+
+        if (noteSpawner == null)
+        {
+            Debug.LogError("[GameEntry] NoteSpawner가 할당되지 않았습니다!");
+            yield break;
+        }
+
+        gridManager.SetGridDiff(selectedDifficulty);
+        noteSpawner.grid = gridManager.GetCurrentGrid();
+
+        InitAndPlay();
+    }
     #region - 버튼에서 호출할 초기화 + 재생
     public void InitAndPlay()
     {
