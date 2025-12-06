@@ -13,7 +13,7 @@ public class PlayUI : MonoBehaviour
     [Header("UI부분")]
     [SerializeField] private TMP_Text comboText; // 콤보 효과 텍스트
     [SerializeField] private TMP_Text scoreText; // 점수 텍스트
-    [SerializeField] private Slider scoreSlider; // 점수 슬라이더
+    [SerializeField] private Image gaugeFill; // 점수 슬라이더
     [SerializeField] private Image judgeimage;
 
 
@@ -44,11 +44,11 @@ public class PlayUI : MonoBehaviour
             judge.OnMiss += HandleMiss;
         }
 
-        if (scoreSlider != null)
+        if (gaugeFill != null)
         {
-            scoreSlider.value = sildervalue;
+            gaugeFill.fillAmount = sildervalue;
         }
-            
+
     }
      void OnDisable()
     {
@@ -152,13 +152,16 @@ public class PlayUI : MonoBehaviour
     #region - 게이지 채우는 코루틴
     private IEnumerator Fill()
     {
-        while (Mathf.Abs(scoreSlider.value - sildervalue) > 0.001f)
+        if (gaugeFill == null)
+            yield break;
+
+        while (Mathf.Abs(gaugeFill.fillAmount - sildervalue) > 0.001f)
         {
-            scoreSlider.value = Mathf.Lerp(scoreSlider.value, sildervalue, Time.deltaTime * 6f);
+            gaugeFill.fillAmount = Mathf.Lerp(gaugeFill.fillAmount, sildervalue, Time.deltaTime * 6f);
             yield return null;
         }
 
-        scoreSlider.value = sildervalue;
+        gaugeFill.fillAmount = sildervalue;
     }
     #endregion
 

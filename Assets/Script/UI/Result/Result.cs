@@ -9,7 +9,6 @@ public class Result : MonoBehaviour
     [SerializeField] private Image rankImage;
     [SerializeField] private TMP_Text rankComment;
     [SerializeField] private TMP_Text finalScoreText;
-    [SerializeField] private Slider resultGauge;
 
     [System.Serializable]
     public struct RankData
@@ -33,7 +32,7 @@ public class Result : MonoBehaviour
         gameObject.SetActive(true); // 결과창 켜기
 
         finalScoreText.text = $"Max Combo: {maxCombo}";
-        resultGauge.value = finalGauge;
+        
 
         // 등급 계산 로직
         RankData finalRank = CalculateRank(finalGauge);

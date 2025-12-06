@@ -1,284 +1,63 @@
 {
   "title": "Music2_BPM30",
   "totalsec": 106.849,
-  "counts": {
-    "normalL": 27,
-    "normalR": 27,
-    "long": 0,
-    "slideL": 0,
-    "slideR": 0
-  },
-  "totalLongSec": 0.0,
   "notes": [
-    {
-      "id": 1,
-      "type": "NormalNote_L",
-      "timeSec": 0.0
-    },
-    {
-      "id": 2,
-      "type": "NormalNote_R",
-      "timeSec": 2.0
-    },
-    {
-      "id": 3,
-      "type": "NormalNote_L",
-      "timeSec": 4.0
-    },
-    {
-      "id": 4,
-      "type": "NormalNote_R",
-      "timeSec": 6.0
-    },
-    {
-      "id": 5,
-      "type": "NormalNote_L",
-      "timeSec": 8.0
-    },
-    {
-      "id": 6,
-      "type": "NormalNote_R",
-      "timeSec": 10.0
-    },
-    {
-      "id": 7,
-      "type": "NormalNote_L",
-      "timeSec": 12.0
-    },
-    {
-      "id": 8,
-      "type": "NormalNote_R",
-      "timeSec": 14.0
-    },
-    {
-      "id": 9,
-      "type": "NormalNote_L",
-      "timeSec": 16.0
-    },
-    {
-      "id": 10,
-      "type": "NormalNote_R",
-      "timeSec": 18.0
-    },
-    {
-      "id": 11,
-      "type": "NormalNote_L",
-      "timeSec": 20.0
-    },
-    {
-      "id": 12,
-      "type": "NormalNote_R",
-      "timeSec": 22.0
-    },
-    {
-      "id": 13,
-      "type": "NormalNote_L",
-      "timeSec": 24.0
-    },
-    {
-      "id": 14,
-      "type": "NormalNote_R",
-      "timeSec": 26.0
-    },
-    {
-      "id": 15,
-      "type": "NormalNote_L",
-      "timeSec": 28.0
-    },
-    {
-      "id": 16,
-      "type": "NormalNote_R",
-      "timeSec": 30.0
-    },
-    {
-      "id": 17,
-      "type": "NormalNote_L",
-      "timeSec": 32.0
-    },
-    {
-      "id": 18,
-      "type": "NormalNote_R",
-      "timeSec": 34.0
-    },
-    {
-      "id": 19,
-      "type": "NormalNote_L",
-      "timeSec": 36.0
-    },
-    {
-      "id": 20,
-      "type": "NormalNote_R",
-      "timeSec": 38.0
-    },
-    {
-      "id": 21,
-      "type": "NormalNote_L",
-      "timeSec": 40.0
-    },
-    {
-      "id": 22,
-      "type": "NormalNote_R",
-      "timeSec": 42.0
-    },
-    {
-      "id": 23,
-      "type": "NormalNote_L",
-      "timeSec": 44.0
-    },
-    {
-      "id": 24,
-      "type": "NormalNote_R",
-      "timeSec": 46.0
-    },
-    {
-      "id": 25,
-      "type": "NormalNote_L",
-      "timeSec": 48.0
-    },
-    {
-      "id": 26,
-      "type": "NormalNote_R",
-      "timeSec": 50.0
-    },
-    {
-      "id": 27,
-      "type": "NormalNote_L",
-      "timeSec": 52.0
-    },
-    {
-      "id": 28,
-      "type": "NormalNote_R",
-      "timeSec": 54.0
-    },
-    {
-      "id": 29,
-      "type": "NormalNote_L",
-      "timeSec": 56.0
-    },
-    {
-      "id": 30,
-      "type": "NormalNote_R",
-      "timeSec": 58.0
-    },
-    {
-      "id": 31,
-      "type": "NormalNote_L",
-      "timeSec": 60.0
-    },
-    {
-      "id": 32,
-      "type": "NormalNote_R",
-      "timeSec": 62.0
-    },
-    {
-      "id": 33,
-      "type": "NormalNote_L",
-      "timeSec": 64.0
-    },
-    {
-      "id": 34,
-      "type": "NormalNote_R",
-      "timeSec": 66.0
-    },
-    {
-      "id": 35,
-      "type": "NormalNote_L",
-      "timeSec": 68.0
-    },
-    {
-      "id": 36,
-      "type": "NormalNote_R",
-      "timeSec": 70.0
-    },
-    {
-      "id": 37,
-      "type": "NormalNote_L",
-      "timeSec": 72.0
-    },
-    {
-      "id": 38,
-      "type": "NormalNote_R",
-      "timeSec": 74.0
-    },
-    {
-      "id": 39,
-      "type": "NormalNote_L",
-      "timeSec": 76.0
-    },
-    {
-      "id": 40,
-      "type": "NormalNote_R",
-      "timeSec": 78.0
-    },
-    {
-      "id": 41,
-      "type": "NormalNote_L",
-      "timeSec": 80.0
-    },
-    {
-      "id": 42,
-      "type": "NormalNote_R",
-      "timeSec": 82.0
-    },
-    {
-      "id": 43,
-      "type": "NormalNote_L",
-      "timeSec": 84.0
-    },
-    {
-      "id": 44,
-      "type": "NormalNote_R",
-      "timeSec": 86.0
-    },
-    {
-      "id": 45,
-      "type": "NormalNote_L",
-      "timeSec": 88.0
-    },
-    {
-      "id": 46,
-      "type": "NormalNote_R",
-      "timeSec": 90.0
-    },
-    {
-      "id": 47,
-      "type": "NormalNote_L",
-      "timeSec": 92.0
-    },
-    {
-      "id": 48,
-      "type": "NormalNote_R",
-      "timeSec": 94.0
-    },
-    {
-      "id": 49,
-      "type": "NormalNote_L",
-      "timeSec": 96.0
-    },
-    {
-      "id": 50,
-      "type": "NormalNote_R",
-      "timeSec": 98.0
-    },
-    {
-      "id": 51,
-      "type": "NormalNote_L",
-      "timeSec": 100.0
-    },
-    {
-      "id": 52,
-      "type": "NormalNote_R",
-      "timeSec": 102.0
-    },
-    {
-      "id": 53,
-      "type": "NormalNote_L",
-      "timeSec": 104.0
-    },
-    {
-      "id": 54,
-      "type": "NormalNote_R",
-      "timeSec": 106.0
-    }
+    { "id": 1, "type": "Normal", "timeSec": 0.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "A", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 2, "type": "Normal", "timeSec": 2.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "S", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 3, "type": "Normal", "timeSec": 4.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "D", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 4, "type": "Normal", "timeSec": 6.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "D", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 5, "type": "Normal", "timeSec": 8.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 6, "type": "Normal", "timeSec": 10.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "A", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 7, "type": "Normal", "timeSec": 12.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "S", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 8, "type": "Normal", "timeSec": 14.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "A", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 9, "type": "Normal", "timeSec": 16.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 10, "type": "Normal", "timeSec": 18.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "D", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 11, "type": "Normal", "timeSec": 20.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 12, "type": "Normal", "timeSec": 22.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "A", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 13, "type": "Normal", "timeSec": 24.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "S", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 14, "type": "Normal", "timeSec": 26.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 15, "type": "Normal", "timeSec": 28.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "D", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 16, "type": "Normal", "timeSec": 30.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "A", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 17, "type": "Normal", "timeSec": 32.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "A", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 18, "type": "Normal", "timeSec": 34.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "S", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 19, "type": "Normal", "timeSec": 36.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "D", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 20, "type": "Normal", "timeSec": 38.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+
+    { "id": 21, "type": "Normal", "timeSec": 40.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "A", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 22, "type": "Normal", "timeSec": 42.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 23, "type": "Normal", "timeSec": 44.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "D", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 24, "type": "Normal", "timeSec": 46.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "S", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 25, "type": "Normal", "timeSec": 48.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 26, "type": "Normal", "timeSec": 50.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "D", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 27, "type": "Normal", "timeSec": 52.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "A", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 28, "type": "Normal", "timeSec": 54.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "S", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 29, "type": "Normal", "timeSec": 56.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 30, "type": "Normal", "timeSec": 58.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "D", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+
+    { "id": 31, "type": "Normal", "timeSec": 60.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "A", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 32, "type": "Normal", "timeSec": 62.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 33, "type": "Normal", "timeSec": 64.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "S", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 34, "type": "Normal", "timeSec": 66.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "A", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 35, "type": "Normal", "timeSec": 68.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "D", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 36, "type": "Normal", "timeSec": 70.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 37, "type": "Normal", "timeSec": 72.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 38, "type": "Normal", "timeSec": 74.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "D", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 39, "type": "Normal", "timeSec": 76.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "S", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 40, "type": "Normal", "timeSec": 78.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "A", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+
+    { "id": 41, "type": "Normal", "timeSec": 80.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 42, "type": "Normal", "timeSec": 82.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "A", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 43, "type": "Normal", "timeSec": 84.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "S", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 44, "type": "Normal", "timeSec": 86.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "D", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 45, "type": "Normal", "timeSec": 88.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 46, "type": "Normal", "timeSec": 90.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "D", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 47, "type": "Normal", "timeSec": 92.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "S", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 48, "type": "Normal", "timeSec": 94.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "A", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 49, "type": "Normal", "timeSec": 96.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 50, "type": "Normal", "timeSec": 98.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "D", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 51, "type": "Normal", "timeSec": 100.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "S", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 52, "type": "Normal", "timeSec": 102.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "A", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 53, "type": "Normal", "timeSec": 104.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "W", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" },
+    { "id": 54, "type": "Normal", "timeSec": 106.0, "moveTime": 2.0, "judgeTime": 0.3, "key": "D", "spawnEdge": "top", "spawnIndex": 0, "targetEdge": "bottom" }
   ]
 }

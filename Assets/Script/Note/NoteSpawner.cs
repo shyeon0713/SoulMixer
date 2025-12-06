@@ -101,7 +101,7 @@ public class NoteSpawner : MonoBehaviour
 
     private void Update()
     {
-        if (_notes == null || conductor == null || grid == null)
+        if (_notes == null || _notes.Length == 0)
             return;
 
         float now = conductor.NowSec;
@@ -115,10 +115,18 @@ public class NoteSpawner : MonoBehaviour
     // 노트 스폰
     private void ProcessSpawn(float now)
     {
+
+        int safety = 0;
+
         while (_nextSpawn < _notes.Length)
         {
-            var note = _notes[_nextSpawn];
+            if (safety++ > 2000)
+            {
+                Debug.LogError("Spawn Loop Safety Break!");
+                break;
+            }
 
+            var note = _notes[_nextSpawn];
             // 스폰타임 = 판정시간 - 이동시간 + 미리보기 시간
             float spawnTime = note.Timesec - note.moveTime;
 
