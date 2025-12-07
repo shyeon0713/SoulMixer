@@ -23,51 +23,57 @@ public class DialogueData
     public List<DialogueLine> dialogues;   //List로 대화 가져오기 
     public List<NpcEntry> npcs;
 
-    // 시나리오 종료 후 자동 진행할 곡 정보
-    public string nextSong;       // 곡 이름
-    public string nextDifficulty; // 난이도(Easy/Normal/Hard)
+    // 다음 액션 타입: "PlaySong", "NextDialogue", "NextScenario", "End"
+    public string nextActionType;
+
+    // PlaySong일 때
+    public string nextSong;
+    public string nextDifficulty;
+
+    // NextDialogue일 때 (파일명 직접 지정)
+    public string nextScenarioId;
+
+    // NextScenario는 ScenarioManager의 순서대로 자동 진행
 }
 
 public class DialogueLoader : MonoBehaviour
 {
     public Dictionary<string, DialogueData> scenarioBank = new();
+    public DialogueData dialoguedata;
     //시나리오들을 딕셔너리로 만들어서 관리 + 필요할 때 호출
 
-    public DialogueData dialoguedata;
-    // 현재 사용중인 대사 데이터
-
-    //시나리오 이름(파일명)으로 JSON을 로드하고 scenarioBank에 캐싱
-    public DialogueData LoadScenario(string scenarioName)
+    // 신규: TextAsset으로 직접 로드
+    public DialogueData LoadFromTextAsset(TextAsset jsonFile)
     {
-
-        // 이미 로딩한 시나리오가 있다면 딕셔너리에서 즉시 반환
-        if (scenarioBank.ContainsKey(scenarioName))
-        {
-            dialoguedata = scenarioBank[scenarioName];
-            return dialoguedata;
-        }
-
-        // Resources/JSON/scenarioName.json 파일 로드
-        TextAsset jsonFile = Resources.Load<TextAsset>("JSON/" + scenarioName);
-
         if (jsonFile == null)
         {
-            Debug.LogError($"시나리오 파일을 찾을 수 없습니다: JSON/{scenarioName}.json");
+            Debug.LogError("[DialogueLoader] TextAsset이 null입니다!");
             return null;
         }
 
-        // JSON → DialogueData 변환
+        string key = jsonFile.name;
+
+        // 이미 로드한 적 있으면 캐시에서 반환
+        if (scenarioBank.ContainsKey(key))
+        {
+            dialoguedata = scenarioBank[key];
+            return dialoguedata;
+        }
+
+        Debug.Log($"[DialogueLoader] JSON 파싱: {jsonFile.name}");
+        Debug.Log($"[DialogueLoader] JSON 내용:\n{jsonFile.text}");
+
         DialogueData data = JsonUtility.FromJson<DialogueData>(jsonFile.text);
 
         if (data == null || data.dialogues == null)
         {
-            Debug.LogError($"JSON 파싱 실패: {scenarioName}");
+            Debug.LogError($"[DialogueLoader] JSON 파싱 실패: {jsonFile.name}");
             return null;
         }
 
-        scenarioBank[scenarioName] = data;
+        Debug.Log($"[DialogueLoader] 파싱 성공! 대화 개수: {data.dialogues.Count}");
 
-        // 현재 데이터 설정
+        scenarioBank[key] = data;
         dialoguedata = data;
         return dialoguedata;
     }

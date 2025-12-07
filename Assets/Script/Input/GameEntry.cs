@@ -21,7 +21,7 @@ public class GameEntry : MonoBehaviour
     public GameObject PlayUI;
 
     private Coroutine _resultRoutine; // 5초뒤에 결과창 UI로 이동하기 위해 코루틴 생성
-
+    public string afterGameDialogueFile;
 
     // 테스트용: 씬 켜지면 자동 재생
     void Awake()
@@ -129,9 +129,26 @@ public class GameEntry : MonoBehaviour
             PlayUI.SetActive(false);
         }
 
+        if (!string.IsNullOrEmpty(afterGameDialogueFile))
+        {
+            StartCoroutine(ResumeDialogueAfterDelay(3f));
+        }
+
     }
     #endregion
 
+    private IEnumerator ResumeDialogueAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        resultUI.SetActive(false);
+
+        DialogueUI dialogueUI = FindFirstObjectByType<DialogueUI>();
+        if (dialogueUI != null)
+        {
+            dialogueUI.ResumeAfterGame(afterGameDialogueFile);
+        }
+    }
 
     public void SelectSong(string songId, string diffText)
     {

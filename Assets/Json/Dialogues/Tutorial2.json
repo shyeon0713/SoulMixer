@@ -1,0 +1,72 @@
+{
+  "dialogues": [
+    {
+      "speaker": "Bartender",
+      "text": "이제 여기서 손님들께 주문을 받는데...",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "...",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "나도 알아! 우리가게가 많이 협소하다는걸 ",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "아니 요즘 세상이 너무 살기가 좋아져서 원한 쌓일 일이 없어서 그래 ",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "하ㅠ 20년전까지만 해도 누구 죽여달라, 누구 없애달라 이러면서 우르르 무리지어서 왔는데 ",
+      "sprite": "normal",
+      "position": "center"    
+    },
+    {
+      "speaker": "Bartender",
+      "text": "지금은 그정도로 깊은 원한을 가진 사람들이 없어.",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "아니 뭐야? 영감탱한테 아무것도 못들었어? 이 가게에 오는 손님들은 대부분은 원한때문에 이곳을 오는거야.",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "하ㅠ 이것도 설명할려면 한 오백년쯤 걸리겠네",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "일단 칵테일 제조부터 하자! 모든것을 이야기할려면 한100년 정도는 걸리니까 말이야",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "다시 눈모양버튼을 눌러서 홀 왼쪽으로 돌아와보겠어?",
+      "sprite": "normal",
+      "position": "center"
+    } 
+   ],
+  "npcs": [
+    {
+      "name": "Bartender",
+      "visible": true
+    }
+  ],
+   "nextActionType": "End"
+
+}   

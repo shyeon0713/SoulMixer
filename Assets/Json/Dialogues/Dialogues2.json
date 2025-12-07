@@ -1,0 +1,91 @@
+{
+  "dialogues": [
+    {
+      "speaker": "Bartender",
+      "text": "자! 우선 칵테일을 제조하기 전에 칵테일주문을 받아야겠지만..",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "지금 손님도 많이 없고, 처음이니까.. 내가 주문을 줄께",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "흠..'마가리타' 한 잔 부탁해 ",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Player",
+      "text": "저.. 죄송하지만 제가 술을 잘몰라서요",
+      "sprite": "",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "아잇, 걱정마. 레시피는 다주고, 정말 간단한 버전으로 주문했어",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "우선 제조할 때, 3*4 크기의 칸이 보일꺼야. 그리드라고 하지. 물론 더 어려운 버전은 칸수가 많아",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "그리드의 가장 자리에 동그라미 버튼들이 생길꺼야. 그리고 반대편 가장자리에 이동하지",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "넌 그냥 리듬에 맞춰서 동그라미 버튼이 목표하는 칸에 도달했을 때 W,A,S,D를 누르기만 하면돼.",
+      "sprite": "normal",
+      "position": "center"
+    },
+   {
+      "speaker": "Bartender",
+      "text": "그리고 동그라미 버튼이 이동하는 경로는 목표지점에 도착하기 전에 그리드에 뜨니까 걱정하지말구",
+      "sprite": "normal",
+      "position": "center"
+    },
+   {
+      "speaker": "Bartender",
+      "text": "또한 어떤 키를 눌러야하는지도 동그라미버튼안에 알려주니까. 참 이 동그라미 버튼은 노트라고 해.",
+      "sprite": "normal",
+      "position": "center"
+    },
+   {
+      "speaker": "Bartender",
+      "text": "말을 좀 두서 없게 했는데 잘 알아 들었는지 모르겠다.",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Player",
+      "text": "정말 설명 못하시네요.",
+      "sprite": "",
+      "position": "center"
+    },
+   {
+      "speaker": "Bartender",
+      "text": "말안해도 알거든! 일단 인생은 실전이야. 한번 해봐",
+      "sprite": "normal",
+      "position": "center"
+    }
+   ],
+  "npcs": [
+    {
+      "name": "Bartender",
+      "visible": true
+    }
+  ],
+    "nextActionType": "PlaySong",
+    "nextSong": "Music2_BPM30",
+    "nextDifficulty": "easy"
+}   

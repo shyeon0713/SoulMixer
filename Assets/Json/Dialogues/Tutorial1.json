@@ -1,0 +1,30 @@
+{
+  "dialogues": [
+    {
+      "speaker": "Bartender",
+      "text": "이 곳은 바 홀이야.",  
+      "sprite": "normal",
+      "position": "center"
+      
+    },
+    {
+      "speaker": "Bartender",
+      "text": "홀 왼쪽에서는 칵테일을 제조해.",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "그리고 홀 오른쪽에서는 손님들의 주문을 받아. 한번 오른쪽의 눈 버튼을 눌러볼래?",
+      "sprite": "normal",
+      "position": "center"
+    }   
+   ],
+  "npcs": [
+    {
+      "name": "Bartender",
+      "visible": true
+    }
+  ],
+   "nextActionType": "End"
+}   

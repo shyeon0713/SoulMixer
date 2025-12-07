@@ -1,0 +1,87 @@
+{
+  "dialogues": [
+    {
+      "speaker": "Bartender",
+      "text": "어서오세요.",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Player",
+      "text": "저기, 어떤 할아버지가 이곳으로 오면..",
+      "sprite": "",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "아! 새로온다던 알바생이군요. 반가워요.",
+      "sprite": "normal",
+      "position": "left"
+    },
+    {
+      "speaker": "Player",
+      "text": "네?",
+      "sprite": "",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "그 이상한 안경을 쓰고 이따시만한 루비반지를 끼고 있던 영감탱이 여기로 오라고 한거 아닌가요?",
+      "sprite": "normal",
+      "position": "left"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "영감탱이 어떤 남자가 오면 일부터 알려주라던데?",
+      "sprite": "normal",
+      "position": "left"
+    },
+    {
+      "speaker": "Player",
+      "text": "어? 맞아요. 그 분이 그랬어요. 전생에 대한 기억을 찾고 싶으면 ..",
+      "sprite": "",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "어머 그럼 더더욱 일을 해야겠네",
+      "sprite": "normal",
+      "position": "left"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "세상에는 무료라는 것이 없으니까요. 혹시 몰라요? 영감탱이 월급 대신 당신이 필요한 것을 줄지? ",
+      "sprite": "normal",
+      "position": "left"
+    },
+    {
+      "speaker": "Player",
+      "text": "일단 일을 하면 되는거죠? 무슨일을 하면 되는거죠? 뭐든지 하겠습니다.",
+      "sprite": "",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "어머.. 디게 겁먹고 바로 튈 똥강아지 같이 생겼는데 성격은 반대로 디게 우직한 편이네 ",
+      "sprite": "normal",
+      "position": "center"
+    },
+    {
+      "speaker": "Bartender",
+      "text": "그럼 따라와요. 가능하면 제일 힘든일을 시키고 싶으니까",
+      "sprite": "normal",
+      "position": "center"
+    }
+  ],
+  "npcs": [
+    {
+      "name": "Bartender",
+      "visible": true
+    }
+  ],
+  "nextActionType": "NextTutorial",
+  "nextScenarioId": "Tutorial1"
+
+
+}
+

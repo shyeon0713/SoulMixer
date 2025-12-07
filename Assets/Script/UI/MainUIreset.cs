@@ -24,8 +24,7 @@ public class MainUIreset : MonoBehaviour
         ResultUI.SetActive(false);
 
         ButtonObjects[0].SetActive(false);  // 처음시작할 떄, right 버튼 안보이도록 설정
-        ButtonObjects[1].SetActive(true);   // 곡선택하는 버튼 활성화
-        ButtonObjects[2].SetActive(true);   // 옵션 버튼 활성화
+      
 
     }
 

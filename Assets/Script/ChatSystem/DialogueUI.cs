@@ -9,33 +9,40 @@ public class SpeakerSpriteSet
 {
     public string speakerName;
     public List<Sprite> sprites;
-    public List<string> spriteNames;   // sprites 와 동일한 순서
+    public List<string> spriteNames;
 }
 
 public class DialogueUI : MonoBehaviour
 {
-
-    // 튜토리얼은 NPC1명 , normal , hard 설명은 NPC2명으로
     public Button nextscript;
-
-    public DialogueLoader dialogueLoader;   // 대사 가져오기
-
-    public System.Action OnDialogueComplete; // 대사 출력이 전부 끝났는지 판별
+    public Button nexttutorial;
+    private DialogueLoader dialogueLoader;
+    public System.Action OnDialogueComplete;
 
     [Header("Text UI 부분")]
     public TMP_Text npcnametext;
     public TMP_Text dialogueText;
 
-    [Header("NPC 이미지 -> 하나의 Dictionary로 관리")]
+    [Header("튜토리얼 Text UI")]
+    public TMP_Text tutorialDialogueText; // 튜토리얼용
+
+    [Header("NPC 이미지")]
     public List<Image> npcImages;
     public List<string> npcNames;
-
-    public List<SpeakerSpriteSet> spriteSets; // 각 NPC별 스프라이트 묶음 리스트
+    public List<SpeakerSpriteSet> spriteSets;
 
     [Header("이미지 위치")]
     public RectTransform leftSlot;
     public RectTransform rightSlot;
     public RectTransform centerSlot;
+
+    [Header("UI 전환")]
+    public GameObject dialoguePanel;
+    public GameObject gamePlayPanel;
+    public GameEntry gameEntry;
+    public GameObject tutorialPanel;
+
+    public Button tutorialButton2;
 
     private Dictionary<string, Image> imageBank = new();
     private Dictionary<string, Dictionary<string, Sprite>> spriteBank = new();
@@ -44,74 +51,89 @@ public class DialogueUI : MonoBehaviour
     private float typingDelay = 0.05f;
 
     private int currentLine = 0;
-    private Coroutine typingCoroutine; // 타이핑 효과를 담당하는 코루틴
+    private Coroutine typingCoroutine;
 
 
-    [Header("UI 전환")]
-    public GameObject dialoguePanel;
-    public GameObject gamePlayPanel;
-    public GameEntry gameEntry;  // GameEntry 직접 할당
+    void Awake()
+    {
+        // DialogueLoader 찾기 또는 추가
+        dialogueLoader = GetComponent<DialogueLoader>();
+
+        if (dialogueLoader == null)
+        {
+            Debug.LogWarning("[DialogueUI] DialogueLoader가 없어서 자동으로 추가합니다.");
+            dialogueLoader = gameObject.AddComponent<DialogueLoader>();
+        }
+    }
+
 
     void Start()
     {
+        if (nextscript == null)
+        {
+            Debug.LogError("[DialogueUI] Next Script Button이 할당되지 않았습니다!");
+            return;
+        }
 
-        dialogueLoader.LoadScenario("conversation");
-        nextscript.onClick.AddListener(NextLine); // 버튼 리스너 연결
-
+        nexttutorial.onClick.AddListener(NextLine);
+        nextscript.onClick.AddListener(NextLine);
         OnDialogueComplete += HandleDialogueEnd;
+
+  
+
+        if (tutorialButton2 != null)
+            tutorialButton2.onClick.AddListener(() => StartTutorialByButton("Tutorial2"));
+
 
         BuildImageBank();
         BuildSpriteBank();
 
-        // 모든 NPC 이미지 비활성화
-        foreach (var img in imageBank.Values)
-            img.gameObject.SetActive(false);
+        // ★ 초기 UI 상태 설정 (추가!)
+        if (dialoguePanel != null)
+            dialoguePanel.SetActive(true);   // 대화창 켜기
 
-        var data = dialogueLoader.dialoguedata;  // 등장할 npc 목록 표시 
+        if (tutorialPanel != null)
+            tutorialPanel.SetActive(false);  // 튜토리얼 끄기
+
+        if (gamePlayPanel != null)
+            gamePlayPanel.SetActive(false);  // 게임 끄기
 
 
-        if (data.npcs != null)
+        // ScenarioManager에서 첫 시나리오 로드
+        var firstScenario = ScenarioManager.Instance.GetCurrentScenario();
+
+        if (firstScenario != null)
         {
-            foreach (var npcEntry in data.npcs)
-            {
-                if (imageBank.TryGetValue(npcEntry.name, out var img))
-                {
-                    img.gameObject.SetActive(npcEntry.visible);
-                }
-            }
+            Debug.Log($"[DialogueUI] 첫 시나리오 로드: {firstScenario.scenarioId}");
+            dialogueLoader.LoadFromTextAsset(firstScenario.jsonFile);
+            UpdateDialogueUI();  
         }
-
-        // 대사 출력
-        if (data.dialogues != null && data.dialogues.Count > 0)
-            OutputDialogue(currentLine);
-
+        else
+        {
+            Debug.LogError("[DialogueUI] 시작 시나리오를 찾을 수 없습니다!");
+        }
     }
-
-
 
     private void BuildImageBank()
     {
-        imageBank.Clear(); // 초기화 
-
+        imageBank.Clear();
         int count = Mathf.Min(npcImages.Count, npcNames.Count);
 
         for (int i = 0; i < count; i++)
         {
             var img = npcImages[i];
-            var name = npcNames[i];   // line.speaker와 정확히 같은 이름이어야 함
+            var name = npcNames[i];
 
             if (img == null || string.IsNullOrEmpty(name))
                 continue;
 
-            // "speaker 이름" → "해당 Image" 매핑
             imageBank[name] = img;
         }
     }
 
     private void BuildSpriteBank()
     {
-
-        spriteBank.Clear(); // 초기화
+        spriteBank.Clear();
 
         foreach (var set in spriteSets)
         {
@@ -120,7 +142,7 @@ public class DialogueUI : MonoBehaviour
 
             for (int i = 0; i < count; i++)
             {
-                string faceName = set.spriteNames[i]; // "happy", "sad" 등
+                string faceName = set.spriteNames[i];
                 Sprite sp = set.sprites[i];
 
                 if (string.IsNullOrEmpty(faceName) || sp == null)
@@ -133,12 +155,20 @@ public class DialogueUI : MonoBehaviour
         }
     }
 
-    void NextLine()  // 버튼 리스너
+    void NextLine()
     {
+        bool isTutorialMode = tutorialPanel != null && tutorialPanel.activeSelf;
+        TMP_Text targetText = isTutorialMode && tutorialDialogueText != null
+            ? tutorialDialogueText
+            : dialogueText;
+
         if (typingCoroutine != null)
         {
             StopCoroutine(typingCoroutine);
-            dialogueText.text = dialogueLoader.dialoguedata.dialogues[currentLine].text;
+
+            if (targetText != null)
+                targetText.text = dialogueLoader.dialoguedata.dialogues[currentLine].text;
+
             typingCoroutine = null;
             return;
         }
@@ -148,7 +178,6 @@ public class DialogueUI : MonoBehaviour
         if (currentLine >= dialogueLoader.dialoguedata.dialogues.Count)
         {
             nextscript.interactable = false;
-
             OnDialogueComplete?.Invoke();
             return;
         }
@@ -156,31 +185,34 @@ public class DialogueUI : MonoBehaviour
         OutputDialogue(currentLine);
     }
 
-    // 대화 화면 구성하는 UI출력
+
     void OutputDialogue(int index)
     {
         var line = dialogueLoader.dialoguedata.dialogues[index];
 
-        npcnametext.text = line.speaker;
+        // 튜토리얼 모드인지 확인
+        bool isTutorialMode = tutorialPanel != null && tutorialPanel.activeSelf;
 
-        bool isPlayerLine = (line.speaker == "Player");  // 플레이어 대사 기준
+        //튜토리얼이 아닐 때만 speaker 출력
+        if (!isTutorialMode && npcnametext != null)
+            npcnametext.text = line.speaker;
 
-        if (isPlayerLine)  // 플레이어가 대사를 할때 NPC전부 회색처리
+        bool isPlayerLine = (line.speaker == "Player");
+
+        if (isPlayerLine)
         {
             SetAllImagesGray();
         }
         else
         {
-            // 화자 NPC가 비활성 상태라면 이때 켜기
             if (imageBank.TryGetValue(line.speaker, out var img))
             {
                 if (!img.gameObject.activeSelf)
                     img.gameObject.SetActive(true);
             }
 
-            ResetAllImagesToWhite();  // 생성된 이미지 전부 흰색으로 설정
-
-            ApplyPosition(line.speaker, line.position);  // 위치 배치
+            ResetAllImagesToWhite();
+            ApplyPosition(line.speaker, line.position);
 
             foreach (var kvp in imageBank)
             {
@@ -191,47 +223,57 @@ public class DialogueUI : MonoBehaviour
             if (spriteBank.ContainsKey(line.speaker) &&
                 spriteBank[line.speaker].ContainsKey(line.sprite))
             {
-                imageBank[line.speaker].sprite =
-                    spriteBank[line.speaker][line.sprite];
+                imageBank[line.speaker].sprite = spriteBank[line.speaker][line.sprite];
             }
             else
             {
-                Debug.LogWarning(
-                    $"스프라이트 '{line.sprite}'를 speaker '{line.speaker}'에서 찾을 수 없습니다.");
+                Debug.LogWarning($"스프라이트 '{line.sprite}'를 speaker '{line.speaker}'에서 찾을 수 없습니다.");
             }
         }
 
         if (typingCoroutine != null)
             StopCoroutine(typingCoroutine);
 
-        typingCoroutine = StartCoroutine(TypeText(line.text));
+        typingCoroutine = StartCoroutine(TypeText(line.text, isTutorialMode));
     }
 
 
-    #region - 스프라이트 초기화
-    // 모든 스프라이트를 하얀색으로 초기화
+
     void ResetAllImagesToWhite()
     {
         foreach (var img in imageBank.Values)
             img.color = Color.white;
     }
-    // 모든 스프라이트를 회색으로 초기화
+
     void SetAllImagesGray()
     {
         foreach (var img in imageBank.Values)
             img.color = new Color(gray, gray, gray, 1f);
     }
 
-    #endregion 
-    // 대사가 타이핑 형식으로 출력하는 코루틴 메서드
-    IEnumerator TypeText(string text)
+    IEnumerator TypeText(string text, bool isTutorialMode)
     {
-        dialogueText.text = "";
+        Debug.Log($"[DialogueUI] TypeText 시작: isTutorialMode={isTutorialMode}, text={text}");
+
+        // 어느 텍스트 필드를 사용할지 선택
+        TMP_Text targetText;
+
+        if (isTutorialMode && tutorialDialogueText != null)
+            targetText = tutorialDialogueText;
+        else
+            targetText = dialogueText;
+
+        if (targetText == null)
+        {
+            Debug.LogWarning("[DialogueUI] 텍스트 필드가 null입니다!");
+            yield break;
+        }
+
+        targetText.text = "";
 
         foreach (char c in text)
         {
-            dialogueText.text += c;
-            // SoundSetting.Instance.PlaySfx(6);
+            targetText.text += c;
             yield return new WaitForSeconds(typingDelay);
         }
 
@@ -239,13 +281,12 @@ public class DialogueUI : MonoBehaviour
     }
 
 
-    #region - 스프라이트 위치결정 -> 앵커 이동
     void ApplyPosition(string speaker, string pos)
     {
         if (!imageBank.ContainsKey(speaker))
             return;
 
-        Vector2 targetPos = pos switch   // switch 표현식 - C# 8 이상
+        Vector2 targetPos = pos switch
         {
             "right" => rightSlot.anchoredPosition,
             "left" => leftSlot.anchoredPosition,
@@ -254,30 +295,53 @@ public class DialogueUI : MonoBehaviour
 
         imageBank[speaker].rectTransform.anchoredPosition = targetPos;
     }
-    #endregion
 
-
+    // 대화 종료 시 분기 처리
     void HandleDialogueEnd()
     {
         var data = dialogueLoader.dialoguedata;
 
-        if (string.IsNullOrEmpty(data.nextSong))
+        if (string.IsNullOrEmpty(data.nextActionType))
         {
-            Debug.Log("[DialogueUI] 다음 곡 정보가 없어 스킵됩니다.");
+            Debug.Log("[DialogueUI] 다음 액션이 없어 종료됩니다.");
             return;
         }
 
-        Debug.Log($"[DialogueUI] 대화 종료. 다음 곡: {data.nextSong} ({data.nextDifficulty})");
+        Debug.Log($"[DialogueUI] 대화 종료. 다음 액션: {data.nextActionType}");
 
-         // 같은 씬에서 처리
-            StartGameInSameScene(data.nextSong, data.nextDifficulty);
-        
+        switch (data.nextActionType)
+        {
+            case "PlaySong":
+                StartGameInSameScene(data.nextSong, data.nextDifficulty);
+                break;
+
+            case "NextDialogue":   //json기반으로 가져오기
+                LoadScenarioById(data.nextScenarioId);  
+                break;
+
+            case "NextScenario":  // 튜토리얼 매니저 기반으로 가져오기
+                LoadNextScenarioInSequence();
+                break;
+
+            case "End":
+                EndDialogue();
+                break;
+
+            case "NextTutorial":  //json기반으로 가져오기
+                LoadTutorialById(data.nextScenarioId);
+                break;
+
+            default:
+                Debug.LogWarning($"[DialogueUI] 알 수 없는 액션 타입: {data.nextActionType}");
+                break;
+        }
     }
+
+    // 게임 플레이 시작
     private void StartGameInSameScene(string songId, string difficulty)
     {
         Debug.Log($"[DialogueUI] 같은 씬에서 게임 시작: {songId} ({difficulty})");
 
-        // UI 전환
         if (dialoguePanel != null)
         {
             dialoguePanel.SetActive(false);
@@ -290,10 +354,9 @@ public class DialogueUI : MonoBehaviour
             Debug.Log("[DialogueUI] 게임 플레이 UI 활성화");
         }
 
-        // GameEntry 확인
         if (gameEntry == null)
         {
-            Debug.LogWarning("[DialogueUI] GameEntry가 Inspector에 할당되지 않음. FindObjectOfType으로 검색 시도...");
+            Debug.LogWarning("[DialogueUI] GameEntry가 Inspector에 할당되지 않음. FindFirstObjectByType으로 검색...");
             gameEntry = FindFirstObjectByType<GameEntry>();
         }
 
@@ -303,7 +366,6 @@ public class DialogueUI : MonoBehaviour
             return;
         }
 
-        // 곡 정보 전달 및 시작
         try
         {
             Debug.Log($"[DialogueUI] GameEntry.SelectSong 호출: {songId}, {difficulty}");
@@ -314,5 +376,185 @@ public class DialogueUI : MonoBehaviour
         {
             Debug.LogError($"[DialogueUI] 게임 시작 실패: {ex.Message}\n{ex.StackTrace}");
         }
+    }
+
+
+
+    // TutorialManager 순서대로 다음 시나리오
+    private void LoadNextScenarioInSequence()
+    {
+        Debug.Log("[DialogueUI] ScenarioManager에서 다음 시나리오 로드");
+
+        if (ScenarioManager.Instance.MoveToNextScenario())
+        {
+            var nextScenario = ScenarioManager.Instance.GetCurrentScenario();
+
+            // TextAsset으로 로드
+            dialogueLoader.LoadFromTextAsset(nextScenario.jsonFile);
+            currentLine = 0;
+            nextscript.interactable = true;
+
+            UpdateDialogueUI();
+        }
+        else
+        {
+            Debug.Log("[DialogueUI] 모든 시나리오 완료!");
+            EndDialogue();
+        }
+    }
+
+    // 대화 종료
+    private void EndDialogue()
+    {
+        Debug.Log("[DialogueUI] 대화 시스템 종료");
+
+        if (dialoguePanel != null)
+            dialoguePanel.SetActive(false);
+
+        // TODO: 메인 메뉴로 복귀하거나 엔딩 처리
+    }
+
+    // UI 업데이트 (NPC 이미지 및 첫 대사 출력)
+    private void UpdateDialogueUI()
+    {
+        // dialoguedata가 null이면 리턴
+        if (dialogueLoader.dialoguedata == null)
+        {
+            Debug.LogWarning("[DialogueUI] dialoguedata가 null입니다. 시나리오를 먼저 로드하세요.");
+            return;
+        }
+
+        // NPC 이미지 초기화
+        foreach (var img in imageBank.Values)
+            img.gameObject.SetActive(false);
+
+        var data = dialogueLoader.dialoguedata;
+
+        // 새 NPC 표시
+        if (data.npcs != null)
+        {
+            foreach (var npcEntry in data.npcs)
+            {
+                if (imageBank.TryGetValue(npcEntry.name, out var img))
+                {
+                    img.gameObject.SetActive(npcEntry.visible);
+                }
+            }
+        }
+
+        // 첫 대사 출력
+        if (data.dialogues != null && data.dialogues.Count > 0)
+            OutputDialogue(currentLine);
+    }
+
+
+    #region - json 파일에서 지정해 놓은 대로 분기 설정
+
+    // 외부에서 시나리오 ID로 직접 로드
+    public void LoadScenarioById(string scenarioId)
+    {
+        Debug.Log($"[DialogueUI] 시나리오 ID로 로드: {scenarioId}");
+
+        var data = ScenarioManager.Instance.LoadScenario(scenarioId, dialogueLoader);
+
+        if (data == null)
+        {
+            Debug.LogError($"[DialogueUI] 시나리오 로드 실패: {scenarioId}");
+            return;
+        }
+
+        currentLine = 0;
+        nextscript.interactable = true;
+
+        if (dialoguePanel != null)
+            dialoguePanel.SetActive(true);
+
+        if (gamePlayPanel != null)
+            gamePlayPanel.SetActive(false);
+
+        UpdateDialogueUI();
+    }
+
+
+    private void LoadTutorialById(string tutorialId)
+    {
+        Debug.Log($"[DialogueUI] 튜토리얼 시작: {tutorialId}");
+
+        // 시나리오 UI OFF
+        dialoguePanel?.SetActive(false);
+
+        // 게임 UI OFF
+        gamePlayPanel?.SetActive(false);
+
+        // 튜토리얼 UI ON
+        tutorialPanel?.SetActive(true);
+
+        // 튜토리얼 JSON 로드 (LoadScenarioById 사용 금지)
+        var data = ScenarioManager.Instance.LoadScenario(tutorialId, dialogueLoader);
+
+        if (data == null)
+        {
+            Debug.LogError($"튜토리얼 로드 실패: {tutorialId}");
+            return;
+        }
+
+        currentLine = 0;
+        nextscript.interactable = true;
+
+        // 이미지 리셋 후 출력
+        UpdateDialogueUI();
+    }
+
+    #endregion
+
+    // 게임 종료 후 대화 재개 (GameEntry에서 호출)
+    public void ResumeAfterGame(string nextScenarioId)
+    {
+        Debug.Log($"[DialogueUI] 게임 후 대화 재개: {nextScenarioId}");
+
+        if (gamePlayPanel != null)
+            gamePlayPanel.SetActive(false);
+
+        if (dialoguePanel != null)
+            dialoguePanel.SetActive(true);
+
+        if (!string.IsNullOrEmpty(nextScenarioId))
+        {
+            LoadScenarioById(nextScenarioId);  // ← 수정!
+        }
+        else
+        {
+            Debug.LogWarning("[DialogueUI] 다음 시나리오 ID가 지정되지 않음");
+        }
+    }
+
+
+    public void StartTutorialByButton(string tutorialId)
+    {
+        // 1. 먼저 JSON 로드
+        var data = ScenarioManager.Instance.LoadScenario(tutorialId, dialogueLoader);
+
+        if (data == null)
+        {
+            Debug.LogError($"[DialogueUI] 튜토리얼 로드 실패: {tutorialId}");
+            return;
+        }
+
+        // 2. UI 전환 (LoadScenarioById 호출 금지!)
+        if (dialoguePanel != null)
+            dialoguePanel.SetActive(false);   // 대화창 끄기
+
+        if (gamePlayPanel != null)
+            gamePlayPanel.SetActive(false);
+
+        if (tutorialPanel != null)
+            tutorialPanel.SetActive(true);    // 튜토리얼 패널만 켜기
+
+        // 3. 대화 상태 초기화
+        currentLine = 0;
+        nextscript.interactable = true;
+
+        // 4. UI 업데이트 (첫 대사 출력)
+        UpdateDialogueUI();
     }
 }
