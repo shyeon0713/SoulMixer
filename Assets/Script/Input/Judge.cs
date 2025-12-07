@@ -103,6 +103,8 @@ public class Judge : MonoBehaviour
 
         // DSP 기준 현재 시간(초) 계산
         float t = (float)(inputDspTime - conductor.dspStart) + conductor.userOffsetms / 1000f;
+        Debug.Log($"[Judge] OnKeyHit key={key}, t={t}");
+
 
         // 현재 시각 기준으로 지나간 노트 정리
         CullPastNotes(t);
@@ -117,8 +119,9 @@ public class Judge : MonoBehaviour
     {
 
         int bestIndex = -1;
-        float bestDiff = float.MaxValue;
         float judgmentWindow = MsToSec(goodMs);
+
+        Debug.Log($"[Judge] OnKeyHit key={key}, now={nowSec:F3}");
 
         // _idx부터 앞으로 보면서 "같은 키" + "시간차가 가장 작은 노트" 찾기
         for (int i = _idx; i < _notes.Length; i++)
@@ -138,17 +141,22 @@ public class Judge : MonoBehaviour
             if (diff > judgmentWindow)
                 break;
 
-            // 가장 가까운 노트 갱신
-            if (absDiff < bestDiff)
+            Debug.Log(
+             $"[Judge]  candidate idx={i}, noteTime={_notes[i].Timesec:F3}, " +
+            $"diff={diff:F3}s ({diff * 1000f:F1}ms)");
+
+            // good 윈도우 안에 들어온 "첫 번째" 노트 하나만 선택
+            if (absDiff <= judgmentWindow)
             {
-                bestDiff = absDiff;
                 bestIndex = i;
+                break;
             }
         }
 
         // 매칭되는 노트를 못 찾았다면 Miss
         if (bestIndex < 0)
         {
+            Debug.Log($"[Judge] MISS(no match) key={key}, now={nowSec:F3}");
             // 어떤 노트와도 매칭 안 된 Miss. 필요하다면 가짜 NoteData 만들어 전달
             OnMiss?.Invoke(new NoteData
             {
@@ -161,7 +169,13 @@ public class Judge : MonoBehaviour
 
         // 판정 등급 계산
         float deltaSec = _notes[bestIndex].Timesec - nowSec;
+        float deltaMs = deltaSec * 1000f;
         var grade = GradeFromDelta(deltaSec);
+
+        Debug.Log($"[Judge] key={key}, noteId={_notes[bestIndex].id}, " +
+          $"noteTime={_notes[bestIndex].Timesec:F3}, now={nowSec:F3}, " +
+          $"delta={deltaSec * 1000f:F1}ms, grade={grade}");
+
 
         if (grade == HitGrade.Miss)
         {
@@ -197,5 +211,15 @@ public class Judge : MonoBehaviour
 
     #endregion
 
-   
+    private void Update()
+    {
+        if (conductor == null || _notes == null || _notes.Length == 0)
+            return;
+
+        // 자동 Miss 정리
+        CullPastNotes(conductor.NowSec);
+
+        // 자동 Miss만으로도 모든 노트가 소비되면 결과창으로 넘어갈 수 있게
+        CheckAllNotesJudged();
+    }
 }

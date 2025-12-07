@@ -7,6 +7,7 @@ public class NoteSpawner : MonoBehaviour
     [Header("참조 오브젝트")]
     public Conductor conductor;
     public NoteSprite spriteSet;
+    public NoteSprite highlightSpriteSet;
     public RectTransform noteLayer;
 
     public FieldGrid[] grids;  // [0]=easy, [1]=normal, [2]=hard
@@ -36,6 +37,7 @@ public class NoteSpawner : MonoBehaviour
     {
         public NoteData data;
         public UINoteView view;
+        public Image highlight;
     }
 
     private class PendingPreview
@@ -168,7 +170,7 @@ public class NoteSpawner : MonoBehaviour
         }
 
         float now = conductor.NowSec;
-        Debug.Log($"[NoteSpawner] Update - now: {now}, _nextSpawn: {_nextSpawn}/{_notes.Length}");  // ★ 추가
+  
 
         try
         {
@@ -185,9 +187,23 @@ public class NoteSpawner : MonoBehaviour
 
     private void ProcessSpawn(float now)
     {
+        if (_notes == null || _notes.Length == 0)
+        {
+            Debug.LogWarning("[NoteSpawner] ProcessSpawn: _notes가 null이거나 비어있음");
+            return;
+        }
+
         int spawnCount = 0;
         int safetyCounter = 0;
         const int MAX_SAFETY = 100;
+
+        // 첫 노트 정보 로그
+        if (_nextSpawn < _notes.Length)
+        {
+            var nextNote = _notes[_nextSpawn];
+            float nextSpawnTime = Mathf.Max(0f, nextNote.Timesec - Mathf.Max(0.1f, nextNote.moveTime));
+         //   Debug.Log($"[NoteSpawner] ProcessSpawn - now: {now:F3}, _nextSpawn: {_nextSpawn}, 다음 노트 spawnTime: {nextSpawnTime:F3}");
+        }
 
         while (_nextSpawn < _notes.Length && safetyCounter < MAX_SAFETY)
         {
@@ -207,6 +223,8 @@ public class NoteSpawner : MonoBehaviour
 
             float moveTime = Mathf.Max(0.1f, note.moveTime);
             float spawnTime = Mathf.Max(0f, note.Timesec - moveTime);
+
+        //    Debug.Log($"[NoteSpawner] 노트 {note.id} 체크 - timeSec: {note.Timesec:F3}, moveTime: {moveTime:F3}, spawnTime: {spawnTime:F3}, now: {now:F3}, 차이: {(spawnTime - now):F3}");
 
             if (now < spawnTime)
                 break;
@@ -264,15 +282,20 @@ public class NoteSpawner : MonoBehaviour
         {
             var item = _active[i];
 
-            float despawnTime = item.data.Timesec + item.data.judgeTime + 0.5f;
+            float despawnTime = item.data.Timesec + item.data.judgeTime ;
 
-            if (now > despawnTime)
+          // 판정 시간 +여유 0.5초 지난 뒤에만 회수할려고 했는데 0.5f 텀이 너무 김
+
+        if (now > despawnTime)
             {
+                // 노트 반환
                 Recycle(item.view);
-                _active.RemoveAt(i);
 
-                if (grid != null)
-                    grid.ClearHighlights();
+                // 이 노트의 하이라이트만 반환
+                if (item.highlight != null)
+                    grid.ReleaseHighlight(item.highlight);
+
+                _active.RemoveAt(i);
             }
         }
     }
@@ -285,7 +308,7 @@ public class NoteSpawner : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[NoteSpawner] SpawnOne 시작 - noteId: {n.id}, key: {n.key}");
+      //  Debug.Log($"[NoteSpawner] SpawnOne 시작 - noteId: {n.id}, key: {n.key}");
 
         // 1. 시작 위치 계산
         string edge = string.IsNullOrEmpty(n.spawnEdge) ? "top" : n.spawnEdge.ToLower();
@@ -299,17 +322,17 @@ public class NoteSpawner : MonoBehaviour
             return;
         }
 
-        // 2. 목표 위치 계산 (반대편 edge의 같은 index)
-        string targetEdge = grid.GetOppositeEdge(edge);
-        var (tr, tc) = grid.GetEdgeIndexByJson(targetEdge, index);
+        
+        //  랜덤 워크로 목표 셀까지 경로 생성
+        int minSteps = Mathf.Max(1, n.minpath);
+        int maxSteps = Mathf.Max(minSteps, n.maxpath);
 
-        if (!grid.IsValidCell(tr, tc))
-        {
-            Debug.LogWarning($"[NoteSpawner] Invalid target cell ({tr},{tc}), using start position");
-            tr = sr;
-            tc = sc;
-        }
+        var path = grid.GenerateRandomPathToOppositeEdge(sr, sc, edge, minSteps, maxSteps);
+        var (tr, tc) = path[path.Count - 1];
 
+       // Debug.Log($"[NoteSpawner] RandomPath len={path.Count} start=({sr},{sc}) target=({tr},{tc})");
+
+        // 3. 셀 → NoteLayer 좌표 변환 (지금 쓰는 방식 그대로)
         Vector2 posStart = grid.GetCellLocalPos(sr, sc);
         Vector2 posTarget = grid.GetCellLocalPos(tr, tc);
 
@@ -321,70 +344,90 @@ public class NoteSpawner : MonoBehaviour
         }
 
         view.gameObject.SetActive(true);
+        float arriveSec = conductor.NowSec + n.moveTime;
 
-        try
-        {
-            view.Init(
-                noteLayer,
-                posStart,
-                posTarget,
-                conductor,
-                n.Timesec
-            );
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError($"[NoteSpawner] view.Init error: {ex.Message}");
-            Recycle(view);
-            return;
-        }
+        view.Init(
+            noteLayer,
+            posStart,
+            posTarget,
+            conductor,
+            arriveSec
+        );
 
-        Debug.Log($"[NoteSpawner] 스프라이트 설정 시작 - key: {n.key}");
-
+        // 키에 따른 스프라이트 지정
         var img = view.GetComponentInChildren<Image>();
-        Debug.Log($"[NoteSpawner] Image 컴포넌트: {(img != null ? "찾음" : "NULL")}");
-        Debug.Log($"[NoteSpawner] spriteSet: {(spriteSet != null ? "있음" : "NULL")}");
+        Sprite noteSprite = null;
 
-        if (img != null && spriteSet != null)
-        {
-            var sp = spriteSet.GetSpriteByKeyString(n.key);
-            Debug.Log($"[NoteSpawner] GetSpriteByKeyString('{n.key}') 결과: {(sp != null ? sp.name : "NULL")}");
-            if (sp != null)
-            {
-                img.sprite = sp;
-                Debug.Log($"[NoteSpawner] ✓ 스프라이트 설정 완료: {sp.name}");
-            }
-            else
-            {
-                Debug.LogWarning($"[NoteSpawner] Sprite not found for key: {n.key}");
-            }
+        if(img != null && spriteSet != null)
+{
+            noteSprite = spriteSet.GetSpriteByKeyString(n.key);   // ★ noteSprite에 저장
+            if (noteSprite != null)
+                img.sprite = noteSprite;
         }
 
-        // 직선 경로 (시작점 → 목표점)
-        var path = new List<(int, int)>
+        // 5. 목표 지점에 하이라이트 1개 생성
+        Image highlightImg = grid.HighlightSingleCell(tr, tc);
+
+
+        if (highlightImg != null)
         {
-            (sr, sc),
-            (tr, tc)
-        };
+            Sprite hlSprite = null;
 
-        float previewShowTime = Mathf.Max(0f, n.Timesec - n.moveTime - pathPreviewTime);
+            if (highlightSpriteSet != null)
+                hlSprite = highlightSpriteSet.GetSpriteByKeyString(n.key); // 전용 세트
+            else
+                hlSprite = noteSprite; // 없으면 노트 스프라이트 재사용
 
-        if (_pendingPreviews.Count > MAX_PREVIEW_BUFFER)
-            _pendingPreviews.RemoveAt(0);
+            if (hlSprite != null)
+                highlightImg.sprite = hlSprite;
+        }
 
-        _pendingPreviews.Add(new PendingPreview
-        {
-            showTime = previewShowTime,
-            path = path,
-            shown = false
-        });
 
+        // 6. 활성 목록에 등록
         _active.Add(new ActiveItem
         {
             data = n,
-            view = view
+            view = view,
+            highlight = highlightImg
         });
 
-        Debug.Log($"[NoteSpawner] ✓ Spawn {n.id} from {edge}[{index}]({sr},{sc}) → {targetEdge}[{index}]({tr},{tc})");
+        Debug.Log(
+            $"[NoteSpawner] ✓ Spawn {n.id} from {edge}[{index}]({sr},{sc}) → target({tr},{tc})"
+        );
     }
+
+    public void HandleJudgeHit(NoteData note, HitGrade grade)
+    {
+        DespawnNoteById(note.id);
+    }
+
+    public void HandleJudgeMiss(NoteData note)
+    {
+        // note.id == -1 인 가짜 Miss(아무 노트 못 찾음)는 무시
+        if (note.id < 0)
+            return;
+
+        DespawnNoteById(note.id);
+    }
+
+    private void DespawnNoteById(int noteId)
+    {
+        // _active 리스트에서 해당 노트를 찾아서 제거
+        for (int i = _active.Count - 1; i >= 0; i--)
+        {
+            if (_active[i].data.id == noteId)
+            {
+                // 노트 오브젝트 풀로 되돌리기
+                Recycle(_active[i].view);
+                _active.RemoveAt(i);
+                break;
+            }
+        }
+        // 하이라이트를 노트별로 관리하고 있지 않으면,
+        // 일단 전체 Clear로 처리 (나중에 per-note 로 바꾸고 싶으면 구조 확장)
+        if (grid != null)
+            grid.ClearHighlights();
+    }
+
+
 }

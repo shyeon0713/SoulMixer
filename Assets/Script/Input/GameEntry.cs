@@ -88,6 +88,7 @@ public class GameEntry : MonoBehaviour
         Debug.Log("[GameEntry] Judge.LoadChart 호출");
         //판정/ 스폰 세팅
         judge.LoadChart(notes);
+        judge.ResetJudgment();
 
         Debug.Log("[GameEntry] NoteSpawner.LoadChart 호출");
         noteSpawner.LoadChart(notes);
@@ -95,13 +96,22 @@ public class GameEntry : MonoBehaviour
         judge.OnAllNotesJudged -= HandleAllnotesJudged;
         judge.OnAllNotesJudged += HandleAllnotesJudged;
 
+        judge.OnHit -= noteSpawner.HandleJudgeHit;
+        judge.OnMiss -= noteSpawner.HandleJudgeMiss;
+        judge.OnHit += noteSpawner.HandleJudgeHit;
+        judge.OnMiss += noteSpawner.HandleJudgeMiss;
+
         // 오프셋 적용
         var chart = selectedSongEntry.GetChart(selectedDifficulty);
         //  conductor.userOffsetms = selectedSongEntry.offsetMs + chart.offsetMs;
 
-        // 5) 재생
+       //재생 전 시간 확인
+        Debug.Log($"[GameEntry] 재생 전 - conductor.NowSec: {conductor.NowSec:F3}");
+
+        // 재생
         conductor.music = audioSource;
         conductor.PlayScheduled(0.1);
+
     }
     #endregion
 
@@ -114,7 +124,9 @@ public class GameEntry : MonoBehaviour
         if (_resultRoutine != null)
             StopCoroutine(_resultRoutine);
 
-        _resultRoutine = StartCoroutine(GoToResultAfterDelay(5f)); //5초 뒤에 결과창으로 이동
+        ShowResult();
+
+        //_resultRoutine = StartCoroutine(GoToResultAfterDelay(2f)); //2초 뒤에 결과창으로 이동
     }
 
     private IEnumerator GoToResultAfterDelay(float delay)
@@ -132,11 +144,15 @@ public class GameEntry : MonoBehaviour
         if (conductor.music != null)
             conductor.music.Stop();
 
-
         if (resultUI != null)
         {
+            Debug.Log("[GameEntry] resultUI 활성화 / PlayUI 비활성화");
             resultUI.SetActive(true);
             PlayUI.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("[GameEntry] resultUI가 Inspector에 할당되지 않았습니다.");
         }
 
         if (!string.IsNullOrEmpty(afterGameDialogueFile))

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddec90a3941fbcf45b1438124244f561, type: 3}
+  m_Name: Highlight
+  m_EditorClassIdentifier: 
+  keySprites:
+  - {fileID: 21300000, guid: 5bd31a15321dea84c99809c0b723b632, type: 3}
+  - {fileID: 21300000, guid: a9f580094ea639343b267230701dc5a9, type: 3}
+  - {fileID: 21300000, guid: 19a1524400966324fa8b8bfe2b1288f9, type: 3}
+  - {fileID: 21300000, guid: 1e0a96febff12c14690687f34bb03ce1, type: 3}
+  - {fileID: 21300000, guid: 658460db9bc02e34788dcbbe8eaa5b0e, type: 3}
+  - {fileID: 21300000, guid: be6de669b3de3fa418f527ab998c3b24, type: 3}
+  - {fileID: 21300000, guid: 741ebcec49da2f1479a37a8b92dd2ba0, type: 3}
+  - {fileID: 21300000, guid: fbadaa36a1af1814cb393c3b0920e872, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  fallbackSprite: {fileID: 0}

@@ -13,6 +13,7 @@ public class HighlightPool : MonoBehaviour
 
     private readonly Stack<Image> pool = new();
     private readonly List<Image> activeList = new();
+
     void Awake()
     {
         Warmup();
@@ -47,7 +48,19 @@ public class HighlightPool : MonoBehaviour
 
         img.gameObject.SetActive(true);
         activeList.Add(img);
+
+        Debug.Log($"[HighlightPool] Get() -> 활성화: {img.name}, activeSelf={img.gameObject.activeSelf}");
         return img;
+    }
+
+    //개별 하이라이트 반환
+    public void Release(Image img)
+    {
+        if (img == null) return;
+
+        img.gameObject.SetActive(false);
+        activeList.Remove(img);
+        pool.Push(img);
     }
 
     public void ClearAll()

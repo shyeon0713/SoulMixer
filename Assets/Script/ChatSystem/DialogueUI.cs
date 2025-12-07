@@ -256,7 +256,7 @@ public class DialogueUI : MonoBehaviour
 
     IEnumerator TypeText(string text, bool isTutorialMode)
     {
-        Debug.Log($"[DialogueUI] TypeText 시작: isTutorialMode={isTutorialMode}, text={text}");
+    //    Debug.Log($"[DialogueUI] TypeText 시작: isTutorialMode={isTutorialMode}, text={text}");
 
         // 어느 텍스트 필드를 사용할지 선택
         TMP_Text targetText;
@@ -351,7 +351,7 @@ public class DialogueUI : MonoBehaviour
             Debug.Log("[DialogueUI] 대화창 비활성화");
         }
 
-        if (gamePlayPanel != null)
+        if (gamePlayPanel != null && !gamePlayPanel.activeSelf)
         {
             gamePlayPanel.SetActive(true);
             Debug.Log("[DialogueUI] 게임 플레이 UI 활성화");
@@ -373,6 +373,13 @@ public class DialogueUI : MonoBehaviour
         {
             Debug.Log($"[DialogueUI] GameEntry.SelectSong 호출: {songId}, {difficulty}");
             gameEntry.SelectSong(songId, difficulty);
+
+            // 4) GameEntry의 PlayUI도 확실히 켜준다 (NoteLayer가 이 자식이면 같이 켜짐)
+            if (gameEntry.PlayUI != null && !gameEntry.PlayUI.activeSelf)
+            {
+                gameEntry.PlayUI.SetActive(true);
+                Debug.Log("[DialogueUI] GameEntry.PlayUI 활성화");
+            }
 
             Debug.Log("[DialogueUI] GameEntry.InitAndPlay 호출");
             gameEntry.InitAndPlay();

@@ -33,9 +33,9 @@ public class Conductor : MonoBehaviour
     public double dspStart;
    public float userOffsetms = 0f;
 
-    public float startDelaySec = 3f;  //곡 시작 딜레이 -> 3초 뒤 시작
+    public float startDelaySec = 1f;  //곡 시작 딜레이 -> 1초 뒤 시작
 
-    public float NowSec => (float)(AudioSettings.dspTime - dspStart) + userOffsetms / 1000f;
+    public float NowSec => (float)(AudioSettings.dspTime - dspStart) + (userOffsetms / 1000f);
 
     public void PlayScheduled(double lead = 0.010)
     {
@@ -43,5 +43,9 @@ public class Conductor : MonoBehaviour
 
         dspStart = AudioSettings.dspTime + totalLead;
         music.PlayScheduled(dspStart);
+
+        // 시작하는 초 알기
+        Debug.Log($"[Conductor] PlayScheduled - dspStart: {dspStart}, AudioSettings.dspTime: {AudioSettings.dspTime}, totalLead: {totalLead}");
+        Debug.Log($"[Conductor] 현재 NowSec: {NowSec}");
     }
 }

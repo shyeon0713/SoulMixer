@@ -24,8 +24,8 @@ public class CameraShaker : MonoBehaviour
 
         while (time < duration)
         {
-            float x = Random.Range(-6f, 6f) * magnitude; 
-            float y = Random.Range(-3f, 3f) * magnitude;
+            float x = Random.Range(-1f, 1f) * magnitude; 
+            float y = Random.Range(-1f, 1f) * magnitude;
 
             transform.localPosition = originalPos + new Vector3(x, y, 0); // 카메라 쉐이크
             time += Time.deltaTime;

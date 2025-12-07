@@ -123,7 +123,7 @@ public class PlayUI : MonoBehaviour
 
         //카메라 쉐이크 -> 싱글톤을 만들어서 필요할 때 호출 : 근데 Miss때만 사용할 것 같음
         if (CameraShaker.instance != null)
-            CameraShaker.instance.Shake(0.15f, 0.2f);
+            CameraShaker.instance.Shake(0.25f, 1.0f);
 
         if (sildervalue > 0)  // 게이지 점수가 0일때만 변화
         {

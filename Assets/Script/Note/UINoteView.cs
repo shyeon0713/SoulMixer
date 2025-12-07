@@ -12,6 +12,7 @@ public class UINoteView : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log("[UINoteView] Awake 실행됨");
         if (rect == null)
             rect = GetComponent<RectTransform>();
     }
@@ -20,6 +21,7 @@ public class UINoteView : MonoBehaviour
     public void Init(RectTransform parent, Vector2 startLocalPos, Vector2 targetLocalPos,
                      Conductor c, float hitSec)
     {
+
         if (rect == null)
             rect = GetComponent<RectTransform>();
 
@@ -32,7 +34,10 @@ public class UINoteView : MonoBehaviour
         conductor = c;
         _hitSec = hitSec;
         _startSec = c.NowSec;   // 지금 시점부터 hitSec까지 이동
+
+     //   Debug.Log($"[UINoteView] _startSec: {_startSec}, conductor.NowSec: {c.NowSec}");
     }
+
     #endregion
     private void Update()
     {

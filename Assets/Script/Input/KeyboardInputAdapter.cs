@@ -13,6 +13,7 @@ public class KeyboardInputAdapter : MonoBehaviour
         _input = new PlayInput(); // Player.inputactions 에서 자동 생성된 C# 클래스
 
         _input.Player.Hit.performed += OnHit;
+        Debug.Log("[KeyboardInputAdapter] Awake - Input 생성 및 콜백 등록");
     }
 
     private void OnEnable()
@@ -36,6 +37,8 @@ public class KeyboardInputAdapter : MonoBehaviour
 
         // 어떤 키가 눌렸는지
         string keyName = ctx.control.displayName;   // "W", "A", "1" 등
+
+        Debug.Log($"[KeyboardInputAdapter] OnHit 호출: control.path={ctx.control.path}, displayName={keyName}, dsp={dsp}");
 
         // NoteKey enum으로 변환 (네가 만든 enum 기준)
         NoteKey key = ParseKey(keyName);

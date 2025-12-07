@@ -52,6 +52,7 @@ public class ScenarioManager : MonoBehaviour
         }
 
         _instance = this;
+        transform.SetParent(null);
         DontDestroyOnLoad(gameObject);
 
         InitializeScenarios();
