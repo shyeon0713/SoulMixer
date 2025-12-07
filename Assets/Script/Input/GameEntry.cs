@@ -52,6 +52,8 @@ public class GameEntry : MonoBehaviour
         }
 
         gridManager.SetGridDiff(selectedDifficulty);
+
+        noteSpawner.difficulty = selectedDifficulty;
         noteSpawner.grid = gridManager.GetCurrentGrid();
 
         InitAndPlay();
@@ -59,6 +61,8 @@ public class GameEntry : MonoBehaviour
     #region - 버튼에서 호출할 초기화 + 재생
     public void InitAndPlay()
     {
+        Debug.Log("[GameEntry] InitAndPlay 시작");
+
         if (selectedSongEntry == null)
         {
             Debug.LogError("[GameEntry] 선택된 곡이 없습니다!");
@@ -72,14 +76,20 @@ public class GameEntry : MonoBehaviour
        
         // 차트 로드
         var notes = ChartLoader.LoadFromSongEntry(selectedSongEntry, selectedDifficulty);
+
+        Debug.Log($"[GameEntry] 차트 로드 결과 - 노트 개수: {notes?.Length ?? 0}");
+
         if (notes.Length == 0)
         {
             Debug.LogError("[GameEntry] 차트를 찾지 못했습니다.");
             return;
         }
 
+        Debug.Log("[GameEntry] Judge.LoadChart 호출");
         //판정/ 스폰 세팅
         judge.LoadChart(notes);
+
+        Debug.Log("[GameEntry] NoteSpawner.LoadChart 호출");
         noteSpawner.LoadChart(notes);
 
         judge.OnAllNotesJudged -= HandleAllnotesJudged;
@@ -172,22 +182,20 @@ public class GameEntry : MonoBehaviour
 
         selectedDifficulty = diff;
 
+        gridManager.SetGridDiff(selectedDifficulty);
+        noteSpawner.difficulty = selectedDifficulty;
+        noteSpawner.grid = gridManager.GetCurrentGrid();
+
         Debug.Log($"[GameEntry] SelectSong 완료 → Song: {selectedSongEntry.title}, Diff: {selectedDifficulty}");
     }
 
+    public SongEntry[] allSongs;
+
     private SongEntry FindSongEntry(string songId)
     {
-        // 한 가지 방식 예시: 씬 내 오브젝트의 SongEntryList를 찾아서 검색
-        var all = Resources.LoadAll<SongEntry>("Songs");
-
-        foreach (var s in all)
-        {
-            if (s.songId == songId)
-                return s;
-        }
-
-        return null;
+        return allSongs.FirstOrDefault(s => s.songId == songId);
     }
+
 }
 
 

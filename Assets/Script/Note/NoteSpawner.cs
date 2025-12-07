@@ -7,13 +7,16 @@ public class NoteSpawner : MonoBehaviour
     [Header("참조 오브젝트")]
     public Conductor conductor;
     public NoteSprite spriteSet;
-    public FieldGrid grid;
     public RectTransform noteLayer;
+
+    public FieldGrid[] grids;  // [0]=easy, [1]=normal, [2]=hard
+    public FieldGrid grid;
+    public Difficulty difficulty = Difficulty.Easy;
 
     [Header("프리팹")]
     public UINoteView notePrefab;
 
-    [Header("프리뷰")]
+    [Header("경로생성 초")]
     public float pathPreviewTime = 2f;
 
     [Header("Pooling")]
@@ -57,12 +60,14 @@ public class NoteSpawner : MonoBehaviour
             enabled = false;
             return;
         }
-        if (grid == null)
+
+        if (noteLayer == null)
         {
-            Debug.LogError("[NoteSpawner] FieldGrid is not assigned! DISABLING SPAWNER");
+            Debug.LogError("[NoteSpawner] NoteLayer is not assigned! DISABLING SPAWNER");
             enabled = false;
             return;
         }
+
         if (noteLayer == null)
         {
             Debug.LogError("[NoteSpawner] NoteLayer is not assigned! DISABLING SPAWNER");
@@ -151,7 +156,10 @@ public class NoteSpawner : MonoBehaviour
     {
 
         if (_notes == null || _notes.Length == 0)
+        {
+            Debug.LogWarning("[NoteSpawner] Update: _notes가 null이거나 비어있음");
             return;
+        }
 
         if (conductor == null)
         {
@@ -160,6 +168,7 @@ public class NoteSpawner : MonoBehaviour
         }
 
         float now = conductor.NowSec;
+        Debug.Log($"[NoteSpawner] Update - now: {now}, _nextSpawn: {_nextSpawn}/{_notes.Length}");  // ★ 추가
 
         try
         {
@@ -276,6 +285,8 @@ public class NoteSpawner : MonoBehaviour
             return;
         }
 
+        Debug.Log($"[NoteSpawner] SpawnOne 시작 - noteId: {n.id}, key: {n.key}");
+
         // 1. 시작 위치 계산
         string edge = string.IsNullOrEmpty(n.spawnEdge) ? "top" : n.spawnEdge.ToLower();
         int index = Mathf.Max(0, n.spawnIndex);
@@ -328,13 +339,20 @@ public class NoteSpawner : MonoBehaviour
             return;
         }
 
+        Debug.Log($"[NoteSpawner] 스프라이트 설정 시작 - key: {n.key}");
+
         var img = view.GetComponentInChildren<Image>();
+        Debug.Log($"[NoteSpawner] Image 컴포넌트: {(img != null ? "찾음" : "NULL")}");
+        Debug.Log($"[NoteSpawner] spriteSet: {(spriteSet != null ? "있음" : "NULL")}");
+
         if (img != null && spriteSet != null)
         {
             var sp = spriteSet.GetSpriteByKeyString(n.key);
+            Debug.Log($"[NoteSpawner] GetSpriteByKeyString('{n.key}') 결과: {(sp != null ? sp.name : "NULL")}");
             if (sp != null)
             {
                 img.sprite = sp;
+                Debug.Log($"[NoteSpawner] ✓ 스프라이트 설정 완료: {sp.name}");
             }
             else
             {

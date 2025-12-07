@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d784635c3fb8b54ebac72090b136cb4, type: 3}
   m_Name: Music2
   m_EditorClassIdentifier: 
-  songId: M2
+  songId: Music2
   title: Music2
   audioClip: {fileID: 8300000, guid: fda3d91c8b191d844affbb05f608db0d, type: 3}
   charts:
   - difficulty: 0
-    chartJson: {fileID: 4900000, guid: 5281143db4c07d949a2f7dc69b8bacc1, type: 3}
+    chartJson: {fileID: 4900000, guid: f42d9e48a942c5046aed6e1279299cb3, type: 3}
     offsetMs: 5
     bpm: 30
   - difficulty: 1

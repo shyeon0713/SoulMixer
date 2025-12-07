@@ -588,6 +588,7 @@ MonoBehaviour:
   gamePlayPanel: {fileID: 287475370}
   gameEntry: {fileID: 287475376}
   tutorialPanel: {fileID: 1993214568}
+  tutorialButton1: {fileID: 757799794}
   tutorialButton2: {fileID: 647009382}
 --- !u!1 &79260007
 GameObject:
@@ -2757,7 +2758,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &287475371
 Transform:
   m_ObjectHideFlags: 0
@@ -2828,6 +2829,8 @@ MonoBehaviour:
   resultUI: {fileID: 1447039652}
   PlayUI: {fileID: 287475370}
   afterGameDialogueFile: 
+  allSongs:
+  - {fileID: 11400000, guid: 3b645b0c02a430f4dbe714c173e70474, type: 2}
 --- !u!114 &287475378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2842,8 +2845,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   conductor: {fileID: 287475375}
   spriteSet: {fileID: 11400000, guid: 057a1b175b763504c951ed4827a62e7c, type: 2}
-  grid: {fileID: 1007456303}
   noteLayer: {fileID: 1310445344}
+  grids:
+  - {fileID: 2139042546}
+  - {fileID: 1015761505}
+  - {fileID: 1778841376}
+  grid: {fileID: 0}
+  difficulty: 0
   notePrefab: {fileID: 1165388279653492432}
   pathPreviewTime: 2
   initialPoolSize: 64
@@ -4980,8 +4988,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1369982042}
-  - {fileID: 7136387}
   - {fileID: 1310445344}
+  - {fileID: 7136387}
   - {fileID: 826120287}
   - {fileID: 279386123}
   - {fileID: 1740011494}
@@ -7881,7 +7889,6 @@ GameObject:
   - component: {fileID: 826120287}
   - component: {fileID: 826120289}
   - component: {fileID: 826120288}
-  - component: {fileID: 826120290}
   m_Layer: 0
   m_Name: Img_combo
   m_TagString: Untagged
@@ -7946,18 +7953,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 826120286}
   m_CullTransparentMesh: 1
---- !u!114 &826120290
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 826120286}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72f8fe6cdd6c82448aeda603ce8a4696, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &842054142
 GameObject:
   m_ObjectHideFlags: 0
@@ -9822,7 +9817,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rows: 5
   cols: 4
-  highlightPool: {fileID: 0}
+  highlightPool: {fileID: 7136388}
 --- !u!1 &1018684983
 GameObject:
   m_ObjectHideFlags: 0
@@ -11965,8 +11960,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1626996905}
   - {fileID: 2002316874}
+  - {fileID: 1626996905}
   m_Father: {fileID: 615347365}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -14851,7 +14846,7 @@ RectTransform:
   m_Father: {fileID: 1619065829}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -31, y: 204}
   m_SizeDelta: {x: -42.478, y: 943.45}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -15280,7 +15275,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rows: 6
   cols: 5
-  highlightPool: {fileID: 0}
+  highlightPool: {fileID: 7136388}
 --- !u!1 &1779090539
 GameObject:
   m_ObjectHideFlags: 0
@@ -18404,7 +18399,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rows: 4
   cols: 3
-  highlightPool: {fileID: 0}
+  highlightPool: {fileID: 7136388}
 --- !u!1 &2142293576
 GameObject:
   m_ObjectHideFlags: 0
@@ -18606,7 +18601,7 @@ PrefabInstance:
     - target: {fileID: 293679826425940737, guid: 6746b453f1e3e12438801603265816da, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: e9ed900eb2954694bb654efc9f222a1c, type: 3}
+      objectReference: {fileID: 21300000, guid: a943bfc269038304191caca2cdaba786, type: 3}
     - target: {fileID: 1684813108603547579, guid: 6746b453f1e3e12438801603265816da, type: 3}
       propertyPath: m_Name
       value: Noteprefab

@@ -86,6 +86,6 @@
     }
   ],
     "nextActionType": "PlaySong",
-    "nextSong": "Music2_BPM30",
+    "nextSong": "Music2",
     "nextDifficulty": "easy"
 }   

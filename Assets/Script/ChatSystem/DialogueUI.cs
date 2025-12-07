@@ -42,6 +42,7 @@ public class DialogueUI : MonoBehaviour
     public GameEntry gameEntry;
     public GameObject tutorialPanel;
 
+    public Button tutorialButton1;
     public Button tutorialButton2;
 
     private Dictionary<string, Image> imageBank = new();
@@ -79,7 +80,9 @@ public class DialogueUI : MonoBehaviour
         nextscript.onClick.AddListener(NextLine);
         OnDialogueComplete += HandleDialogueEnd;
 
-  
+
+        if (tutorialButton1 != null)
+            tutorialButton1.onClick.AddListener(() => StartDialogueByButton("Dialogues2")); 
 
         if (tutorialButton2 != null)
             tutorialButton2.onClick.AddListener(() => StartTutorialByButton("Tutorial2"));
@@ -370,6 +373,10 @@ public class DialogueUI : MonoBehaviour
         {
             Debug.Log($"[DialogueUI] GameEntry.SelectSong 호출: {songId}, {difficulty}");
             gameEntry.SelectSong(songId, difficulty);
+
+            Debug.Log("[DialogueUI] GameEntry.InitAndPlay 호출");
+            gameEntry.InitAndPlay();
+
             Debug.Log("[DialogueUI] 게임 시작 성공!");
         }
         catch (System.Exception ex)
@@ -529,6 +536,7 @@ public class DialogueUI : MonoBehaviour
     }
 
 
+    // 특정 버튼으로 튜토리얼 실행
     public void StartTutorialByButton(string tutorialId)
     {
         // 1. 먼저 JSON 로드
@@ -556,5 +564,25 @@ public class DialogueUI : MonoBehaviour
 
         // 4. UI 업데이트 (첫 대사 출력)
         UpdateDialogueUI();
+    }
+
+
+    // 특정 버튼으로 다이어로그 실행
+    public void StartDialogueByButton(string scenarioId)
+    {
+        Debug.Log($"[DialogueUI] 버튼으로 대화 시작: {scenarioId}");
+
+        // 기본 시나리오 로드 방식 사용
+        LoadScenarioById(scenarioId);
+
+        // UI 상태 정리 (선택)
+        if (dialoguePanel != null)
+            dialoguePanel.SetActive(true);
+
+        if (tutorialPanel != null)
+            tutorialPanel.SetActive(false);
+
+        if (gamePlayPanel != null)
+            gamePlayPanel.SetActive(false);
     }
 }

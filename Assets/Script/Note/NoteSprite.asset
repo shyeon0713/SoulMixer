@@ -27,4 +27,4 @@ MonoBehaviour:
   - {fileID: 21300000, guid: ff8b122a9c4b12b419b63c1afb403cd0, type: 3}
   - {fileID: 21300000, guid: 2a84a05cd7a4ad84aaff580e36478f5a, type: 3}
   - {fileID: 21300000, guid: ad6c109fb35721f408ff23f2ffcd7cbc, type: 3}
-  fallbackSprite: {fileID: 21300000, guid: fe64caddaad9c8e468b92c1bcee37c15, type: 3}
+  fallbackSprite: {fileID: 21300000, guid: 2a9d11273fa64284dbea46fb645e4fb9, type: 3}
