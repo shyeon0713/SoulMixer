@@ -308,7 +308,7 @@ public class NoteSpawner : MonoBehaviour
             return;
         }
 
-      //  Debug.Log($"[NoteSpawner] SpawnOne 시작 - noteId: {n.id}, key: {n.key}");
+        //  Debug.Log($"[NoteSpawner] SpawnOne 시작 - noteId: {n.id}, key: {n.key}");
 
         // 1. 시작 위치 계산
         string edge = string.IsNullOrEmpty(n.spawnEdge) ? "top" : n.spawnEdge.ToLower();
@@ -322,7 +322,7 @@ public class NoteSpawner : MonoBehaviour
             return;
         }
 
-        
+
         //  랜덤 워크로 목표 셀까지 경로 생성
         int minSteps = Mathf.Max(1, n.minpath);
         int maxSteps = Mathf.Max(minSteps, n.maxpath);
@@ -330,7 +330,7 @@ public class NoteSpawner : MonoBehaviour
         var path = grid.GenerateRandomPathToOppositeEdge(sr, sc, edge, minSteps, maxSteps);
         var (tr, tc) = path[path.Count - 1];
 
-       // Debug.Log($"[NoteSpawner] RandomPath len={path.Count} start=({sr},{sc}) target=({tr},{tc})");
+        // Debug.Log($"[NoteSpawner] RandomPath len={path.Count} start=({sr},{sc}) target=({tr},{tc})");
 
         // 3. 셀 → NoteLayer 좌표 변환 (지금 쓰는 방식 그대로)
         Vector2 posStart = grid.GetCellLocalPos(sr, sc);
@@ -358,8 +358,8 @@ public class NoteSpawner : MonoBehaviour
         var img = view.GetComponentInChildren<Image>();
         Sprite noteSprite = null;
 
-        if(img != null && spriteSet != null)
-{
+        if (img != null && spriteSet != null)
+        {
             noteSprite = spriteSet.GetSpriteByKeyString(n.key);   // ★ noteSprite에 저장
             if (noteSprite != null)
                 img.sprite = noteSprite;
@@ -389,11 +389,7 @@ public class NoteSpawner : MonoBehaviour
             data = n,
             view = view,
             highlight = highlightImg
-        });
-
-        Debug.Log(
-            $"[NoteSpawner] ✓ Spawn {n.id} from {edge}[{index}]({sr},{sc}) → target({tr},{tc})"
-        );
+        }); 
     }
 
     public void HandleJudgeHit(NoteData note, HitGrade grade)

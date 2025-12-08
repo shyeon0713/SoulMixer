@@ -10,40 +10,56 @@ public class KeyboardInputAdapter : MonoBehaviour
 
     private void Awake()
     {
-        _input = new PlayInput(); // Player.inputactions 에서 자동 생성된 C# 클래스
+        // 한 번만 생성
+        _input = new PlayInput();
 
+        // 액션맵 전체 활성화 (혹은 _input.Player.Enable() 만 써도 됨)
+        _input.Enable();
+
+        // 콜백 등록
         _input.Player.Hit.performed += OnHit;
-        Debug.Log("[KeyboardInputAdapter] Awake - Input 생성 및 콜백 등록");
+
+        Debug.Log("[KeyboardInputAdapter] Awake -> PlayInput 생성 및 Enable 완료");
+
+        // 이 오브젝트를 완전히 전역 입력 매니저로 쓴다면:
+        DontDestroyOnLoad(gameObject);
     }
 
+    private void OnDestroy()
+    {
+        if (_input != null)
+        {
+            _input.Player.Hit.performed -= OnHit;
+            _input.Disable();
+            _input = null;
+        }
+
+        Debug.Log("[KeyboardInputAdapter] OnDestroy -> PlayInput Disable 및 정리");
+    }
+
+    // 굳이 액션맵을 끄지 말고, 상태 로그만 남겨두자
     private void OnEnable()
     {
-        // 액션맵 활성화
-        _input.Player.Enable();
+        Debug.Log("[KeyboardInputAdapter] OnEnable (입력은 이미 Enable 상태 유지)");
     }
 
     private void OnDisable()
     {
-        // 액션맵 비활성화 + 콜백 해제
-        _input.Player.Disable();
-        _input.Player.Hit.performed -= OnHit;
+        Debug.Log("[KeyboardInputAdapter] OnDisable (더 이상 Player.Disable() 호출하지 않음)");
     }
 
     private void OnHit(InputAction.CallbackContext ctx)
     {
         if (!ctx.performed) return;
+        if (judge == null || conductor == null) return;
 
         double dsp = AudioSettings.dspTime;
 
-        // 어떤 키가 눌렸는지
-        string keyName = ctx.control.displayName;   // "W", "A", "1" 등
-
-        Debug.Log($"[KeyboardInputAdapter] OnHit 호출: control.path={ctx.control.path}, displayName={keyName}, dsp={dsp}");
-
-        // NoteKey enum으로 변환 (네가 만든 enum 기준)
+        string keyName = ctx.control.displayName;
         NoteKey key = ParseKey(keyName);
 
-        // Judge 쪽에 키 입력 전달 (Judge에 OnKeyHit 메서드 추가해둔 기준)
+        Debug.Log($"[KeyboardInputAdapter] OnHit 호출됨, key={key}, phase={ctx.phase}, control={keyName}");
+
         judge.OnKeyHit(key, dsp);
     }
 
@@ -70,4 +86,5 @@ public class KeyboardInputAdapter : MonoBehaviour
         }
     }
 }
+
 
