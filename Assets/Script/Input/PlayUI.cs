@@ -24,7 +24,7 @@ public class PlayUI : MonoBehaviour
     [SerializeField] private float perfectGain = 0.08f;
     [SerializeField] private float greatGain = 0.05f;
     [SerializeField] private float goodGain = 0.02f;
-    [SerializeField] private float missLoss = 0.10f;
+    [SerializeField] private float missLoss = 0.07f;
 
     private float sildervalue = 0f;
     private Coroutine fillRoutine;

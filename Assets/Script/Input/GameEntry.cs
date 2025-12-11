@@ -32,10 +32,29 @@ public class GameEntry : MonoBehaviour
         StartCoroutine(InitializeAfterFrame());
     }
 
+    private bool isGameEnded = false;
+
+    private void Update()
+    {
+        if (!isGameEnded && audioSource != null)
+        {
+            if (!audioSource.isPlaying && conductor.NowSec > 0.1f)
+            {
+                isGameEnded = true;
+                ShowResult();
+            }
+        }
+    }
     private IEnumerator InitializeAfterFrame()
     {
         // 1프레임 대기 (모든 Awake 완료 보장)
         yield return null;
+
+        // 기존 judge 이벤트 모두 제거
+        judge.OnAllNotesJudged = null;
+
+        // 100% 확실하게 재연결
+        judge.OnAllNotesJudged += HandleAllnotesJudged;
 
         Debug.Log("[GameEntry] 초기화 시작");
 
@@ -140,26 +159,30 @@ public class GameEntry : MonoBehaviour
     #region - 결과창 이동
     private void ShowResult()
     {
-
         if (conductor.music != null)
             conductor.music.Stop();
 
         if (resultUI != null)
         {
-            Debug.Log("[GameEntry] resultUI 활성화 / PlayUI 비활성화");
             resultUI.SetActive(true);
             PlayUI.SetActive(false);
-        }
-        else
-        {
-            Debug.LogError("[GameEntry] resultUI가 Inspector에 할당되지 않았습니다.");
+
+            var playUI = FindFirstObjectByType<PlayUI>();
+            var result = resultUI.GetComponent<Result>();
+
+            if (playUI != null && result != null)
+            {
+                float finalGauge = playUI.GetFinalGauge();
+                int maxCombo = playUI.GetMaxCombo();
+
+                result.OpenResult(finalGauge, maxCombo);
+            }
         }
 
         if (!string.IsNullOrEmpty(afterGameDialogueFile))
         {
             StartCoroutine(ResumeDialogueAfterDelay(3f));
         }
-
     }
     #endregion
 
